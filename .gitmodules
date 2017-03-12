@@ -1,0 +1,3 @@
+[submodule ".cget"]
+	path = .cget
+	url = git@github.com:cget/cget-core.git

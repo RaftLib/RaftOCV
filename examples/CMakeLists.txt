@@ -1,0 +1,5 @@
+add_executable(video_capture video_capture.cpp)
+target_link_libraries(video_capture RaftOCV)
+
+add_executable(stereo_capture stereo_capture.cpp)
+target_link_libraries(stereo_capture RaftOCV)

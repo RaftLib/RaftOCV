@@ -1,8 +1,4 @@
-add_executable(video_capture video_capture.cpp)
-target_link_libraries(video_capture RaftOCV)
-
-add_executable(stereo_capture stereo_capture.cpp)
-target_link_libraries(stereo_capture RaftOCV)
-
-add_executable(stereo_calibrate stereo_calibrate.cpp)
-target_link_libraries(stereo_calibrate RaftOCV)
+foreach(main video_capture video_save stereo_capture stereo_calibrate video_playback)
+    add_executable(${main} ${main}.cpp)
+    target_link_libraries(${main} RaftOCV)
+endforeach()

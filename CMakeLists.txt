@@ -5,23 +5,29 @@ set(CMAKE_CXX_STANDARD 14)
 
 include(package.cmake)
 
-include_directories( . )
+include_directories( include )
 
 find_package( Threads )
 find_package(Qt5Core)
 find_package(Qt5Gui)
 
 add_library(RaftOCV STATIC
-        UVCSource.cpp UVCSource.h
-        ROIFilter.cpp ROIFilter.h
-        ConvertColorFilter.cpp ConvertColorFilter.h
-        DisplayFrameSink.cpp DisplayFrameSink.h
-        StereoBMFilter.cpp StereoBMFilter.h
-        HeatmapFilter.cpp HeatmapFilter.h
-        UndistortFilter.cpp UndistortFilter.h
-        FindChessboardCornersKernel.cpp FindChessboardCornersKernel.h
-        Metadata.cpp Metadata.h
-        JoinMetadataKernel.cpp JoinMetadataKernel.h DuplicateKernel.cpp DuplicateKernel.h NullSink.cpp NullSink.h StereoCalibrateKernel.cpp StereoCalibrateKernel.h)
+        UVCSource.cpp include/UVCSource.h
+        ROIFilter.cpp include/ROIFilter.h
+        ConvertColorFilter.cpp include/ConvertColorFilter.h
+        DisplayFrameSink.cpp include/DisplayFrameSink.h
+        StereoBMFilter.cpp include/StereoBMFilter.h
+        HeatmapFilter.cpp include/HeatmapFilter.h
+        UndistortFilter.cpp include/UndistortFilter.h
+        FindChessboardCornersKernel.cpp include/FindChessboardCornersKernel.h
+        Metadata.cpp include/Metadata.h
+        JoinMetadataKernel.cpp include/JoinMetadataKernel.h
+        DuplicateKernel.cpp include/DuplicateKernel.h
+        NullSink.cpp include/NullSink.h
+        StereoCalibrateKernel.cpp include/StereoCalibrateKernel.h
+        VideoCaptureSink.cpp include/VideoCaptureSink.h
+        VideoCaptureSource.cpp include/VideoCaptureSource.h
+        )
 
 target_link_libraries(RaftOCV raftd opencv_core opencv_highgui opencv_imgproc
         opencv_imgcodecs Qt5::Gui v4l2 opencv_calib3d

@@ -1,4 +1,5 @@
 #include <raft>
+#include <opencv2/imgproc/types_c.h>
 
 class ConvertColorFilter : public raft::kernel {
     int16_t ConversionType;

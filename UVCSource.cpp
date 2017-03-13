@@ -39,13 +39,13 @@ struct UVCSource_p {
     struct timeval                  tv;
     int                             r, fd = -1;
     unsigned int                    i, n_buffers;
-    const char                      *dev_name = "/dev/video1";
+
     struct buffer                   *buffers;
     uint32_t frameWidth = 1748;
     uint32_t frameHeight = 408;
 
-    UVCSource_p(UVCSource &t) : t(t) {
-        fd = v4l2_open(dev_name, O_RDWR | O_NONBLOCK, 0);
+    UVCSource_p(const std::string& source, UVCSource &t) : t(t) {
+        fd = v4l2_open(source.c_str(), O_RDWR | O_NONBLOCK, 0);
         if (fd < 0) {
             perror("Cannot open device");
             exit(EXIT_FAILURE);
@@ -63,9 +63,12 @@ struct UVCSource_p {
         fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
         fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
         xioctl(fd, VIDIOC_S_FMT, &fmt);
-        if ((fmt.fmt.pix.width != frameWidth) || (fmt.fmt.pix.height != frameHeight))
+        if ((fmt.fmt.pix.width != frameWidth) || (fmt.fmt.pix.height != frameHeight)) {
             printf("Warning: driver is sending image at %dx%d\\n",
                    fmt.fmt.pix.width, fmt.fmt.pix.height);
+            frameWidth = fmt.fmt.pix.width;
+            frameHeight = fmt.fmt.pix.height;
+        }
 
         CLEAR(req);
         req.count = 2;
@@ -147,7 +150,7 @@ raft::kstatus UVCSource::run() {
     return raft::proceed;
 }
 
-UVCSource::UVCSource() : p(new UVCSource_p(*this)) {
+UVCSource::UVCSource(const std::string& source) : p(new UVCSource_p(source, *this)) {
     output.addPort < MetadataEnvelope<cv::Mat> > ("0");
 }
 

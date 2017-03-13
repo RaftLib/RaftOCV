@@ -1,17 +1,16 @@
 #include <raft>
 #include <DisplayFrameSink.h>
 #include <ConvertColorFilter.h>
-
-#include "UVCSource.h"
+#include <VideoCaptureSource.h>
 
 int main() {
-    UVCSource src;
-    ConvertColorFilter convert(CV_YUV2BGR_YUY2);
+    VideoCaptureSource src("my-file.avi");
     DisplayFrameSink sink("Video");
 
     raft::map m;
-    m += src >> convert >> sink;
+    m += src >> sink;
 
     m.exe();
     return( EXIT_SUCCESS );
 }
+

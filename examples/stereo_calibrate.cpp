@@ -1,18 +1,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <cstdint>
 #include <iostream>
 #include <raft>
-#include <chrono>
-#include <cinttypes>
 #include <DisplayFrameSink.h>
 #include <ConvertColorFilter.h>
 #include <StereoBMFilter.h>
-#include <HeatmapFilter.h>
 #include <raftinc/print.tcc>
 #include <DuplicateKernel.h>
 #include <Metadata.h>
-#include <NullSink.h>
 #include <JoinMetadataKernel.h>
 #include <StereoCalibrateKernel.h>
 #include "FindChessboardCornersKernel.h"
@@ -50,8 +45,6 @@ int main() {
     m += findChessboardL["0"]["0"] >> join["1"];
     m += join >> sck;
 
-/** start time for printing frame rate **/
-    auto start =  std::chrono::high_resolution_clock::now();
     m.exe();
     return( EXIT_SUCCESS );
 }

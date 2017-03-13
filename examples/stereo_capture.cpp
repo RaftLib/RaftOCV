@@ -16,8 +16,7 @@
 int main() {
     int offset = 48;
 
-    uint32_t imgWidth = 640;
-    uint32_t imgHeight = 400;
+    uint32_t imgWidth = 640, imgHeight = 400;
     cv::Rect imagesR(offset, 0, imgWidth * 2, imgHeight);
 
     UVCSource src;
@@ -29,8 +28,7 @@ int main() {
 
     raft::map m;
     m += src >> roi >> convert >> stereo >> heatmap >> sink;
-    /** start time for printing frame rate **/
-    auto start =  std::chrono::high_resolution_clock::now();
+
     m.exe();
     return( EXIT_SUCCESS );
 }

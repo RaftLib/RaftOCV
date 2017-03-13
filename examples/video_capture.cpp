@@ -17,7 +17,7 @@ int main() {
     UVCSource src;
     ROIFilter roi(cv::Rect(0, 0, 100, 100));
     DisplayFrameSink sink("Video");
-    ConvertColorFilter convert(CV_YUV2RGB_YUY2);
+    ConvertColorFilter convert(CV_YUV2BGR_YUY2);
 
     raft::map m;
     m += src >> convert >> sink;

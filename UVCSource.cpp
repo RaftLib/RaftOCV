@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 #include <opencv2/core/mat.hpp>
+#include "Metadata.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
@@ -30,7 +31,7 @@ static int xioctl(int fh, int request, void *arg)
 
 struct UVCSource_p {
     UVCSource& t;
-
+    size_t frameId = 0;
     struct v4l2_format              fmt;
     struct v4l2_buffer              buf;
     struct v4l2_requestbuffers      req;
@@ -125,13 +126,16 @@ struct UVCSource_p {
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_MMAP;
         xioctl(fd, VIDIOC_DQBUF, &buf);
+        //std::cerr << t.output["0"].size() << std::endl;
+        //t.output[ "0" ].recycle(t.output["0"].size());
 
-        auto &frame = t.output[ "0" ].template allocate< cv::Mat >();
+        MetadataEnvelope<cv::Mat> frame;
+
         cv::Mat yuv(frameHeight, frameWidth, CV_8UC2, buffers[buf.index].start);
-
+        frame.Metadata().originId = frameId++;
         frame = yuv.clone();
 
-        t.output[ "0" ].send();
+        t.output[ "0" ].push(frame);
 
         xioctl(fd, VIDIOC_QBUF, &buf);
     }
@@ -144,7 +148,7 @@ raft::kstatus UVCSource::run() {
 }
 
 UVCSource::UVCSource() : p(new UVCSource_p(*this)) {
-    output.addPort < cv::Mat > ("0");
+    output.addPort < MetadataEnvelope<cv::Mat> > ("0");
 }
 
 UVCSource::~UVCSource() {}

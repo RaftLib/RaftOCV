@@ -3,3 +3,6 @@ target_link_libraries(video_capture RaftOCV)
 
 add_executable(stereo_capture stereo_capture.cpp)
 target_link_libraries(stereo_capture RaftOCV)
+
+add_executable(stereo_calibrate stereo_calibrate.cpp)
+target_link_libraries(stereo_calibrate RaftOCV)

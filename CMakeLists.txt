@@ -18,9 +18,12 @@ add_library(RaftOCV STATIC
         DisplayFrameSink.cpp DisplayFrameSink.h
         StereoBMFilter.cpp StereoBMFilter.h
         HeatmapFilter.cpp HeatmapFilter.h
-        )
+        UndistortFilter.cpp UndistortFilter.h
+        FindChessboardCornersKernel.cpp FindChessboardCornersKernel.h
+        Metadata.cpp Metadata.h
+        JoinMetadataKernel.cpp JoinMetadataKernel.h DuplicateKernel.cpp DuplicateKernel.h NullSink.cpp NullSink.h StereoCalibrateKernel.cpp StereoCalibrateKernel.h)
 
-target_link_libraries(RaftOCV raft opencv_core opencv_highgui opencv_imgproc
+target_link_libraries(RaftOCV raftd opencv_core opencv_highgui opencv_imgproc
         opencv_imgcodecs Qt5::Gui v4l2 opencv_calib3d
         GL OpenNI2 glfw ${CMAKE_THREAD_LIBS_INIT})
 

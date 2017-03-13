@@ -1,5 +1,6 @@
 #include <opencv2/core/core.hpp>
 #include "StereoBMFilter.h"
+#include "Metadata.h"
 
 struct StereoBMFilter_p {
     StereoBMFilter& t;
@@ -66,7 +67,7 @@ struct StereoBMFilter_p {
 
         sbm->compute(left, right, depth);
 
-        auto &out = t.output["0"].template allocate<cv::Mat>();
+        auto &out = t.output["0"].template allocate<MetadataEnvelope<cv::Mat>>();
         out = depth.clone();
         t.output["0"].send();
 
@@ -75,8 +76,8 @@ struct StereoBMFilter_p {
 };
 
 StereoBMFilter::StereoBMFilter() : p(new StereoBMFilter_p(*this)) {
-    input.addPort<cv::Mat>("0");
-    output.addPort<cv::Mat>("0");
+    input.addPort<MetadataEnvelope<cv::Mat>>("0");
+    output.addPort<MetadataEnvelope<cv::Mat>>("0");
 }
 
 StereoBMFilter::~StereoBMFilter() {

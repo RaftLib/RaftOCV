@@ -1,20 +1,20 @@
 #include "ROIFilter.h"
 
 #include <opencv2/opencv.hpp>
+#include "Metadata.h"
 
 ROIFilter::ROIFilter(const cv::Rect &ROI) : ROI(ROI) {
-    input.addPort<cv::Mat>("0");
-    output.addPort<cv::Mat>("0");
+    input.addPort<MetadataEnvelope<cv::Mat>>("0");
+    output.addPort<MetadataEnvelope<cv::Mat>>("0");
 }
 
 raft::kstatus ROIFilter::run() {
-    auto &img_in = input["0"].template peek<cv::Mat>();
-    auto &out = output["0"].template allocate<cv::Mat>();
+    MetadataEnvelope<cv::Mat> img_in;
+    input["0"].pop(img_in);
+
+    MetadataEnvelope<cv::Mat> out(img_in.Metadata());
 
     out = cv::Mat(img_in, this->ROI).clone();
-
-    input["0"].unpeek();
-    input["0"].recycle(1);
-    output["0"].send();
+    output["0"].push(out);
     return (raft::proceed);
 }

@@ -1,14 +1,13 @@
 #include <opencv2/core/core.hpp>
+#include <pcl/pcl_base.h>
+#include <pcl/visualization/cloud_viewer.h>
 #include "StereoBMFilter.h"
-#include "Metadata.h"
 
 struct StereoBMFilter_p {
     StereoBMFilter& t;
+    std::shared_ptr<StereoCalibrationResults> calib;
 
     cv::Ptr<cv::StereoBM> sbm;
-    cv::Mat cameraMatrix[2], distCoeffs[2];
-    cv::Mat R1, R2, P1, P2, Q;
-    cv::Mat rmap[2][2];
     cv::Size imageSize = { 0, 0 };
     cv::Mat depth;
     cv::Mat left, right;
@@ -21,29 +20,20 @@ struct StereoBMFilter_p {
         sbm->setUniquenessRatio(5);
         sbm->setSpeckleWindowSize(500);
         sbm->setSpeckleRange(20);
-
-        cameraMatrix[0] = (cv::Mat_<double>(3,3) << 414.872943, 0, 316.062049, 0, 414.065879, 191.817217, 0, 0, 1);
-        cameraMatrix[1] = (cv::Mat_<double>(3,3) << 415.322011, 0, 313.360348, 0, 416.459335, 181.660409, 0, 0, 1);
-
-        distCoeffs[0] = (cv::Mat_<double>(1,5) << -0.008932, -0.071132, -0.007234, -0.006453, 0);
-        distCoeffs[1] = (cv::Mat_<double>(1,5) << -0.010971, -0.077097, -0.007257, -0.010744, 0);
-
-        R1 = (cv::Mat_<double>(3,3) << 0.998664, -0.000563, -0.051665, 0.000739, 0.999994, 0.003392, 0.051663, -0.003425, 0.998659);
-        R2 = (cv::Mat_<double>(3,3) << 0.998153, -0.003609, -0.060645, 0.003402, 0.999988, -0.003515, 0.060657, 0.003302, 0.998153);
-
-        P1 = cameraMatrix[0];
-        P2 = cameraMatrix[1];
+        sbm->setDisp12MaxDiff(1);
     }
 
     raft::kstatus run() {
+        if(t.hasCalibInput && t.input["calib"].size()) {
+            t.input["calib"].pop(calib);
+        }
+
         auto &in = t.input["0"].template peek<cv::Mat>();
 
         cv::Size s(in.cols / 2, in.rows);
         if(s != imageSize) {
             imageSize = s;
 
-            cv::initUndistortRectifyMap(cameraMatrix[0], distCoeffs[0], R1, P1, imageSize, CV_16SC2, rmap[0][0], rmap[0][1]);
-            cv::initUndistortRectifyMap(cameraMatrix[1], distCoeffs[1], R2, P2, imageSize, CV_16SC2, rmap[1][0], rmap[1][1]);
             depth = cv::Mat(s.height, s.width, CV_16S );
 
             left.create(imageSize, CV_8UC1);
@@ -59,17 +49,42 @@ struct StereoBMFilter_p {
         t.input["0"].unpeek();
         t.input["0"].recycle(1);
 
-        cv::Mat img1r, img2r;
-        remap(right, img1r, rmap[0][0], rmap[0][1], cv::INTER_LINEAR);
-        remap(left, img2r, rmap[1][0], rmap[1][1], cv::INTER_LINEAR);
-        right = img1r;
-        left= img2r;
-
         sbm->compute(left, right, depth);
 
         auto &out = t.output["0"].template allocate<MetadataEnvelope<cv::Mat>>();
         out = depth.clone();
         t.output["0"].send();
+
+
+        if(calib && t.hasPCOutput) {
+            cv::Mat points, points1, disp8;
+            cv::normalize(depth, disp8, 0, 255, CV_MINMAX, CV_8U);
+            cv::reprojectImageTo3D(disp8, points, calib->Q, true);
+
+            pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_xyzrgb (new pcl::PointCloud<pcl::PointXYZRGB>);
+
+            for (int rows = 0; rows < points.rows; ++rows) {
+                for (int cols = 0; cols < points.cols; ++cols) {
+                    cv::Point3f point = points.at<cv::Point3f>(rows, cols);
+                    double dist = cv::norm(point);
+                    if(std::isfinite(dist) && dist < 5) {
+                        pcl::PointXYZRGB pcl_point_rgb;
+                        pcl_point_rgb.x = point.x;    // rgb PointCloud
+                        pcl_point_rgb.y = point.y;
+                        pcl_point_rgb.z = point.z;
+
+                        cv::Vec3b intensity = right_roi.at<cv::Vec3b>(rows, cols); //BGR
+                        uint32_t rgb = (static_cast<uint32_t>(intensity[2]) << 16 |
+                                        static_cast<uint32_t>(intensity[1]) << 8 | static_cast<uint32_t>(intensity[0]));
+                        pcl_point_rgb.rgb = *reinterpret_cast<float *>(&rgb);
+
+                        cloud_xyzrgb->push_back(pcl_point_rgb);
+                    }
+                }
+            }
+
+            t.output["pointcloud"].push(cloud_xyzrgb);
+        }
 
         return raft::proceed;
     }
@@ -86,4 +101,20 @@ StereoBMFilter::~StereoBMFilter() {
 
 raft::kstatus StereoBMFilter::run() {
     return p->run();
+}
+
+auto StereoBMFilter::newCalibInput() -> decltype(input["calib"]) {
+    hasCalibInput = true;
+    input.addPort<std::shared_ptr<CalibrationResults>>("calib");
+    return input["calib"];
+}
+
+auto StereoBMFilter::newPointcloudOutput() -> decltype((*this)["pointcloud"]) {
+    hasPCOutput = true;
+    output.addPort<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>("pointcloud");
+    return (*this)["pointcloud"];
+}
+
+void StereoBMFilter::SetCalibration(const StereoCalibrationResults &results) {
+    p->calib = std::make_shared<StereoCalibrationResults>(results);
 }

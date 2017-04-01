@@ -44,7 +44,7 @@ struct UVCSource_p {
     uint32_t frameWidth = 1748;
     uint32_t frameHeight = 408;
 
-    UVCSource_p(const std::string& source, UVCSource &t) : t(t) {
+    UVCSource_p(const std::string& source, UVCSource &t, uint32_t* width = 0, uint32_t* height = 0) : t(t) {
         fd = v4l2_open(source.c_str(), O_RDWR | O_NONBLOCK, 0);
         if (fd < 0) {
             perror("Cannot open device");
@@ -55,6 +55,11 @@ struct UVCSource_p {
         c.id = V4L2_CID_EXPOSURE_AUTO;
         c.value = V4L2_EXPOSURE_AUTO;
         xioctl(fd, VIDIOC_S_CTRL, &c);
+
+        if(width)
+            frameWidth = *width;
+        if(height)
+            frameHeight = *height;
 
         CLEAR(fmt);
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -69,6 +74,11 @@ struct UVCSource_p {
             frameWidth = fmt.fmt.pix.width;
             frameHeight = fmt.fmt.pix.height;
         }
+
+        if(width != 0)
+            *width = frameWidth;
+        if(height != 0)
+            *height = frameHeight;
 
         CLEAR(req);
         req.count = 2;
@@ -151,6 +161,10 @@ raft::kstatus UVCSource::run() {
 }
 
 UVCSource::UVCSource(const std::string& source) : p(new UVCSource_p(source, *this)) {
+    output.addPort < MetadataEnvelope<cv::Mat> > ("0");
+}
+
+UVCSource::UVCSource(uint32_t& width, uint32_t& height, const std::string &source) : p(new UVCSource_p(source, *this, &width, &height)) {
     output.addPort < MetadataEnvelope<cv::Mat> > ("0");
 }
 

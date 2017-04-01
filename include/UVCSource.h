@@ -10,6 +10,7 @@ class UVCSource : public raft::kernel {
     std::string source;
 public:
     UVCSource(const std::string& source = "/dev/video0");
+    UVCSource(uint32_t& width, uint32_t& height, const std::string& source = "/dev/video0");
     ~UVCSource();
     raft::kstatus run() override;
 };

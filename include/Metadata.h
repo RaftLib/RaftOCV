@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <utility>
+#include "CalibrationTypes.h"
+#include <memory>
 
 struct Metadata_t {
     size_t originId = 0;
@@ -12,15 +14,16 @@ struct Metadata_t {
 
 template <typename T>
 struct MetadataEnvelope : public T {
-    Metadata_t metadata;
+    typedef Metadata_t MetadataType;
+    MetadataType metadata;
 
     MetadataEnvelope() = default;
     MetadataEnvelope(const MetadataEnvelope&) = default;
 
-    MetadataEnvelope(const Metadata_t& metadata) : metadata(metadata) {
+    MetadataEnvelope(const MetadataType& metadata) : metadata(metadata) {
     }
 
-    template <typename... Args> MetadataEnvelope(const Metadata_t& metadata,
+    template <typename... Args> MetadataEnvelope(const MetadataType& metadata,
                                                  Args&&... args) : T(std::forward<Args>(args)...),
                                                                    metadata(metadata) {
     }
@@ -30,10 +33,11 @@ struct MetadataEnvelope : public T {
         return *this;
     }
 
-    const Metadata_t& Metadata() const {
+    const MetadataType& Metadata() const {
         return metadata;
     }
-    Metadata_t& Metadata() {
+    MetadataType& Metadata() {
         return metadata;
     }
 };
+

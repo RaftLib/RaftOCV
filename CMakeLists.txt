@@ -4,12 +4,25 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 14)
 
 include(package.cmake)
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -std=c++14")
 
-include_directories( include )
+option(USE_ASAN "Use Address and UB sanitizers" OFF)
+option(USE_PROFILER "Use Address and UB sanitizers" OFF)
+option(BUILD_EXAMPLES "Build the example applications" OFF)
+include_directories( include ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 )
+IF(USE_PROFILER)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
+ENDIF()
 
-find_package( Threads )
-find_package(Qt5Core)
-find_package(Qt5Gui)
+IF(USE_ASAN)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fstack-check -fsanitize=undefined")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=integer -Werror=inconsistent-missing-override")
+    endif()
+    MESSAGE("ASAN enabled")
+ENDIF()
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 add_library(RaftOCV STATIC
         UVCSource.cpp include/UVCSource.h
@@ -27,10 +40,33 @@ add_library(RaftOCV STATIC
         StereoCalibrateKernel.cpp include/StereoCalibrateKernel.h
         VideoCaptureSink.cpp include/VideoCaptureSink.h
         VideoCaptureSource.cpp include/VideoCaptureSource.h
-        )
+        RemapFilter.cpp include/RemapFilter.h
+        CalibrateKernel.cpp include/CalibrateKernel.h
+        CombineFilter.cpp include/CombineFilter.h
+        include/DropFilter.h
+        StereoSubgraph.cpp include/StereoSubgraph.h
+        SplitFilter.cpp include/SplitFilter.h
+        include/NullSource.h
+        PointCloudFilter.cpp include/PointCloudFilter.h
+        CalibrationTypes.cpp include/CalibrationTypes.h
+        PointCloudViewer.cpp include/PointCloudViewer.h
+        include/KeyListener.h
+        PoolAllocator.cpp include/PoolAllocator.h)
 
-target_link_libraries(RaftOCV raftd opencv_core opencv_highgui opencv_imgproc
-        opencv_imgcodecs Qt5::Gui v4l2 opencv_calib3d
+find_package(Threads)
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(PCL 1.3 REQUIRED)
+
+target_link_libraries(RaftOCV
+        raft
+        Qt5::Core Qt5::Gui Qt5::Widgets
+        v4l2
+        opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs opencv_calib3d opencv_video opencv_videoio
+        ${PCL_LIBRARIES}
         GL OpenNI2 glfw ${CMAKE_THREAD_LIBS_INIT})
 
-add_subdirectory(examples)
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()

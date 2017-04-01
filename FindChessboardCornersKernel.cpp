@@ -15,14 +15,16 @@ FindChessboardCornersKernel::FindChessboardCornersKernel(const cv::Size &pattern
 }
 
 raft::kstatus FindChessboardCornersKernel::run() {
-    auto &img_in = input["0"].template peek<MetadataEnvelope<cv::Mat>>();
-    auto &out = output["0"].template allocate<MetadataEnvelope<std::vector<cv::Point2f>>>(img_in.Metadata());
+    MetadataEnvelope<cv::Mat> img_in;
+    input["0"].pop(img_in);
 
-    bool success = cv::findChessboardCorners(img_in, patternSize, out);
-    cv::Mat gray;
-    cv::cvtColor(img_in, gray, CV_RGB2GRAY);
+    MetadataEnvelope<std::vector<cv::Point2f>> out(img_in.Metadata());
+    bool success = cv::findChessboardCorners(img_in, patternSize, out, cv::CALIB_CB_FAST_CHECK);
 
     if(success) {
+        cv::Mat gray;
+        cv::cvtColor(img_in, gray, CV_RGB2GRAY);
+
         cv::cornerSubPix(gray, out, cv::Size(11, 11), cv::Size(-1, -1),
                          cv::TermCriteria(cv::TermCriteria::COUNT + cv::TermCriteria::EPS,
                                           30, 0.01));
@@ -35,13 +37,11 @@ raft::kstatus FindChessboardCornersKernel::run() {
         output["debug"].send();
     }
 
-    input["0"].unpeek();
     input["0"].recycle( input["0"].size() );
 
     if(success)
-        output["0"].send();
-    else
-        output["0"].deallocate();
+        output["0"].push(out);
+
 
     return raft::proceed;
 }

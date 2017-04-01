@@ -6,7 +6,7 @@ template <typename T>
 class DuplicateKernel : public raft::kernel {
     std::size_t  port_name_index = 0;
 public:
-    DuplicateKernel( const std::size_t num_ports = 1 )
+    DuplicateKernel( const std::size_t num_ports = 2 )
     {
         input.addPort< T >( "0" );
 
@@ -17,7 +17,7 @@ public:
         }
     }
 
-    virtual std::size_t  addPort()
+    virtual size_t addPort()
     {
         const auto portid( port_name_index++ );
         output.addPort< T >( std::to_string( portid ) );
@@ -32,8 +32,14 @@ public:
             o.push(val);
         }
 
+        this->input[ "0" ].recycle(this->input[ "0" ].size());
+
         return( raft::proceed );
     }
+
 };
 
-
+template <typename T>
+static DuplicateKernel<typename T::output_t> CreateDuplicateKernel(const T& kernel, size_t numPorts = 2) {
+    return DuplicateKernel<typename T::output_t>(numPorts);
+}

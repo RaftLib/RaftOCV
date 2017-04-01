@@ -29,7 +29,6 @@ raft::kstatus HeatmapFilter::run() {
 	input["0"].unpeek();
 	input["0"].recycle(1);
 
-
 	cv::applyColorMap(out, out, cv::COLORMAP_JET);
 	output["0"].send();
 

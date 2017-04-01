@@ -38,7 +38,7 @@ raft::kstatus VideoCaptureSource::run() {
         }
         output["0"].push(frame);
     }
-    return p->isOpened() ? raft::proceed : raft::stop;
+    return success ? raft::proceed : raft::stop;
 }
 
 VideoCaptureSource::~VideoCaptureSource() {

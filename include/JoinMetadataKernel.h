@@ -4,24 +4,25 @@
 #include "Metadata.h"
 
 template <typename A, typename B>
-class JoinMetadataKernel : public raft::kernel {
+class JoinMetadataKernelBase : public raft::kernel {
 public:
-    JoinMetadataKernel() {
+    JoinMetadataKernelBase() {
         input.addPort<MetadataEnvelope<A>>("0");
         input.addPort<MetadataEnvelope<B>>("1");
-
-        output.addPort<MetadataEnvelope< std::pair<A, B> >>("0");
     }
+
+    virtual void OnMatch(MetadataEnvelope< std::pair<A, B> >& env) = 0;
+
     raft::kstatus run() override {
         auto &Av = input["0"].template peek<MetadataEnvelope<A>>();
         auto &Bv = input["1"].template peek<MetadataEnvelope<B>>();
 
         if(Av.Metadata().originId == Bv.Metadata().originId) {
-            auto &out = output["0"].template allocate<MetadataEnvelope< std::pair<A, B> > >(Av.Metadata());
+            MetadataEnvelope< std::pair<A, B> > out;
             out.first = Av;
             out.second = Bv;
 
-            output["0"].send();
+            OnMatch(out);
 
             input["0"].unpeek();
             input["0"].recycle();
@@ -36,6 +37,19 @@ public:
         }
 
         return raft::proceed;
+    }
+};
+
+template <typename A, typename B>
+class JoinMetadataKernel : public JoinMetadataKernelBase<A, B> {
+public:
+    typedef MetadataEnvelope< std::pair<A, B> > output_t;
+    JoinMetadataKernel() {
+        this->output.template addPort< output_t >("0");
+    }
+
+    void OnMatch(MetadataEnvelope<std::pair<A, B> > &env) override {
+        this->output["0"].push(env);
     }
 };
 

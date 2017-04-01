@@ -3,20 +3,81 @@
 #include "StereoCalibrateKernel.h"
 #include "Metadata.h"
 
+void StereoCalibrateKernel::OnKey(int key) {
+    if(key == ' ' && !lastInput.first.empty()) {
+        std::lock_guard<std::mutex> l(lastInputMutex);
+        imagePoints.push_back(lastInput.first);
+        otherImagePoints.push_back(lastInput.second);
+        matchedObjectPoints.push_back(objectPoints);
+
+        calculate();
+    }
+}
+
 raft::kstatus StereoCalibrateKernel::run() {
     auto &points = input["0"].template peek<input_t>();
 
-    imagePoints1.push_back(points.first);
-    imagePoints2.push_back(points.second);
-    matchedObjectPoints.push_back(objectPoints);
+    {
+        std::lock_guard<std::mutex> l(lastInputMutex);
+        lastInput.swap(points);
+    }
+
 
     std::cerr << "Got " << points.Metadata().originId << std::endl;
     input["0"].unpeek();
     input["0"].recycle();
 
-    calculate();
-
     return raft::proceed;
+}
+
+void StereoCalibrateKernel::calculate() {
+    using namespace cv;
+
+    auto results = std::make_shared<StereoCalibrationResults>();
+
+    results->right.cameraMatrix = initCameraMatrix2D(matchedObjectPoints, imagePoints, imageSize);
+    results->left.cameraMatrix = initCameraMatrix2D(matchedObjectPoints, otherImagePoints, imageSize);
+
+    results->rms = cv::stereoCalibrate(matchedObjectPoints, imagePoints, otherImagePoints,
+                                       results->right.cameraMatrix, results->right.distCoeffs,
+                                       results->left.cameraMatrix, results->left.distCoeffs,
+                                       imageSize, results->rvecs, results->tvecs, results->E, results->F,
+                                       CALIB_FIX_ASPECT_RATIO +
+                                       CALIB_ZERO_TANGENT_DIST +
+                                       CALIB_USE_INTRINSIC_GUESS +
+                                       CALIB_SAME_FOCAL_LENGTH +
+                                       CALIB_RATIONAL_MODEL +
+                                       CALIB_FIX_K3 + CALIB_FIX_K4 + CALIB_FIX_K5,
+                                       TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, 100, 1e-5));
+
+    results->imageSize = imageSize;
+    cv::stereoRectify(results->right.cameraMatrix, results->right.distCoeffs,
+                      results->left.cameraMatrix, results->left.distCoeffs,
+                      imageSize,
+                      results->rvecs, results->tvecs,
+                      results->right.R, results->left.R,
+                      results->right.P, results->left.P,
+                      results->Q,
+                      CALIB_ZERO_DISPARITY, 1, results->imageSize, &results->right.validRoi, &results->left.validRoi);
+
+    std::cerr << results->right.validRoi << std::endl;
+    std::cerr << results->left.validRoi << std::endl;
+    std::cerr << results->rms << std::endl << std::endl;
+
+    if(!saveFile.empty()) {
+        results->Write(saveFile);
+    }
+
+    output["0"].push(results);
+}
+
+StereoCalibrateKernel::StereoCalibrateKernel(cv::Size imageSize, cv::Size boardSize, float squareSize) : imageSize(
+        imageSize) {
+    setupPorts();
+    for (size_t j = 0; j < boardSize.height; j++)
+        for (size_t k = 0; k < boardSize.width; k++)
+            objectPoints.push_back(cv::Point3f(k * squareSize, j * squareSize, 0));
+
 }
 
 StereoCalibrateKernel::StereoCalibrateKernel(cv::Size imageSize, const std::vector<cv::Point3f> &objectPoints) :
@@ -25,47 +86,11 @@ StereoCalibrateKernel::StereoCalibrateKernel(cv::Size imageSize, const std::vect
     setupPorts();
 }
 
-void StereoCalibrateKernel::calculate() {
-    using namespace cv;
-
-    Mat cameraMatrix[2], distCoeffs[2];
-    cameraMatrix[0] = initCameraMatrix2D(matchedObjectPoints,imagePoints1,imageSize);
-    cameraMatrix[1] = initCameraMatrix2D(matchedObjectPoints,imagePoints2,imageSize);
-    Mat R, T, E, F;
-
-    auto rms = cv::stereoCalibrate(matchedObjectPoints, imagePoints1, imagePoints2,
-                        cameraMatrix[0], distCoeffs[0],
-                        cameraMatrix[1], distCoeffs[1],
-                        imageSize, R, T, E, F,
-                        CALIB_FIX_ASPECT_RATIO +
-                        CALIB_ZERO_TANGENT_DIST +
-                        CALIB_USE_INTRINSIC_GUESS +
-                        CALIB_SAME_FOCAL_LENGTH +
-                        CALIB_RATIONAL_MODEL +
-                        CALIB_FIX_K3 + CALIB_FIX_K4 + CALIB_FIX_K5,
-                        TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 100, 1e-5));
-
-    std::cerr << cameraMatrix[0] << std::endl;
-    std::cerr << cameraMatrix[1] << std::endl;
-
-    std::cerr << R << std::endl;
-    std::cerr << T << std::endl;
-    std::cerr << E << std::endl;
-    std::cerr << F << std::endl << std::endl << rms << std::endl << std::endl;
-}
-
-StereoCalibrateKernel::StereoCalibrateKernel(cv::Size imageSize, cv::Size boardSize, float squareSize) : imageSize(imageSize) {
-    setupPorts();
-    for(size_t j = 0; j < boardSize.height; j++ )
-        for(size_t k = 0; k < boardSize.width; k++ )
-            objectPoints.push_back(cv::Point3f(k*squareSize, j*squareSize, 0));
-
-}
-
 StereoCalibrateKernel::StereoCalibrateKernel() {
     setupPorts();
 }
 
 void StereoCalibrateKernel::setupPorts() {
     input.addPort<input_t>("0");
+    output.addPort<output_t>("0");
 }

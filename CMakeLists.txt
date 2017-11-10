@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -std=c++14")
 option(USE_ASAN "Use Address and UB sanitizers" OFF)
 option(USE_PROFILER "Use Address and UB sanitizers" OFF)
 option(BUILD_EXAMPLES "Build the example applications" OFF)
+option(USE_PCL "Use PCL library" OFF)
+
 include_directories( include ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 )
 IF(USE_PROFILER)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
@@ -24,12 +26,11 @@ ENDIF()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
-add_library(RaftOCV STATIC
+SET(RAFTOCV_SRC
         UVCSource.cpp include/UVCSource.h
         ROIFilter.cpp include/ROIFilter.h
         ConvertColorFilter.cpp include/ConvertColorFilter.h
         DisplayFrameSink.cpp include/DisplayFrameSink.h
-        StereoBMFilter.cpp include/StereoBMFilter.h
         HeatmapFilter.cpp include/HeatmapFilter.h
         UndistortFilter.cpp include/UndistortFilter.h
         FindChessboardCornersKernel.cpp include/FindChessboardCornersKernel.h
@@ -47,17 +48,21 @@ add_library(RaftOCV STATIC
         StereoSubgraph.cpp include/StereoSubgraph.h
         SplitFilter.cpp include/SplitFilter.h
         include/NullSource.h
-        PointCloudFilter.cpp include/PointCloudFilter.h
         CalibrationTypes.cpp include/CalibrationTypes.h
-        PointCloudViewer.cpp include/PointCloudViewer.h
         include/KeyListener.h
         PoolAllocator.cpp include/PoolAllocator.h)
+
+IF(USE_PCL)
+    LIST(APPEND RAFTOCV_SRC StereoBMFilter.cpp include/StereoBMFilter.h
+            PointCloudFilter.cpp include/PointCloudFilter.h
+            PointCloudViewer.cpp include/PointCloudViewer.h)
+ENDIF()
+add_library(RaftOCV STATIC ${RAFTOCV_SRC})
 
 find_package(Threads)
 find_package(Qt5Core)
 find_package(Qt5Gui)
 find_package(Qt5Widgets)
-find_package(PCL 1.3 REQUIRED)
 
 target_link_libraries(RaftOCV
         raft
@@ -66,6 +71,11 @@ target_link_libraries(RaftOCV
         opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs opencv_calib3d opencv_video opencv_videoio
         ${PCL_LIBRARIES}
         GL OpenNI2 glfw ${CMAKE_THREAD_LIBS_INIT})
+
+IF(USE_PCL)
+    find_package(PCL 1.8 REQUIRED)
+    target_link_libraries(RaftOCV ${PCL_LIBRARIES})
+ENDIF()
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)

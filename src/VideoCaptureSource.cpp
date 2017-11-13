@@ -21,21 +21,37 @@ struct VideoCapture_p : public cv::VideoCapture {
     bool isFileBased = false;
 };
 
-raft::kstatus VideoCaptureSource::run() {
-    MetadataEnvelope<cv::Mat> frame;
-    bool success = p->read(frame);
-    frame.metadata.originId = p->frameId++;
+
+bool VideoCaptureSource::getNextFrame(cv::Mat &img) {
+    if(frameCap!=-1) {
+        if(frameCap == 0 || frameCap-- == 0)
+            return false;
+    }
+    bool success = p->read(img);
 
     if(success) {
+        frameSize = cv::Size(img.cols, img.rows);
         if(p->isFileBased) {
             if (p->lastMs == -1) {
                 p->lastMs = p->get(cv::CAP_PROP_POS_MSEC);
             } else {
                 auto now = p->get(cv::CAP_PROP_POS_MSEC);
-                std::this_thread::sleep_for(std::chrono::milliseconds((int) (now - p->lastMs)));
+                if(isRealTime) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds((int) (now - p->lastMs)));
+                }
                 p->lastMs = now;
             }
         }
+    }
+    return success;
+}
+
+raft::kstatus VideoCaptureSource::run() {
+    MetadataEnvelope<cv::Mat> frame;
+    bool success = getNextFrame(frame);
+    frame.metadata.originId = p->frameId++;
+
+    if(success) {
         output["0"].push(frame);
     }
     return success ? raft::proceed : raft::stop;
@@ -64,3 +80,4 @@ VideoCaptureSource::VideoCaptureSource(const cv::String &filename, int apiPrefer
 VideoCaptureSource::VideoCaptureSource(int index) : VideoCaptureSource(new VideoCapture_p(index)){
 
 }
+

@@ -1,6 +1,6 @@
-SET(MAINS video_capture video_save stereo_capture stereo_calibrate video_playback camera_calibrate)
+SET(MAINS video_capture video_save stereo_capture stereo_calibrate video_playback camera_calibrate video_stabilization)
 FILE(COPY ps4eye_calib.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 foreach(main ${MAINS})
     add_executable(${main} ${main}.cpp)
-    target_link_libraries(${main} RaftOCV)
+    target_link_libraries(${main} RaftOCV openpose.so)
 endforeach()

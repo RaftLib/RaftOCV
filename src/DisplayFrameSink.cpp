@@ -63,6 +63,10 @@ static struct WindowThread {
            std::unique_lock<std::mutex> l(lock);
            while(!shutDown) {
                cv.wait_for(l, std::chrono::milliseconds(40));
+
+               if(shutDown)
+                   break;
+
                auto wait = cv::waitKey(1);
                switch(wait) {
                    case 't':
@@ -114,6 +118,10 @@ raft::kstatus DisplayFrameSink::run() {
     input["0"].pop(img_in);
     width = img_in.cols;
     height = img_in.rows;
+
+    if(width * height == 0)
+        return raft::proceed;
+
     windowThread.run([&] {
         cv::imshow(frameName, img_in);
         //cv::displayOverlay(frameName, std::to_string(img_in.Metadata().originId));

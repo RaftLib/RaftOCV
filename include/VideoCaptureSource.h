@@ -6,6 +6,12 @@ class VideoCaptureSource : public raft::kernel {
     std::unique_ptr<VideoCapture_p> p;
 
 public:
+    int frameCap = -1;
+    bool getNextFrame(cv::Mat& img);
+    bool isRealTime = false;
+
+    cv::Size frameSize;
+
     ~VideoCaptureSource();
 
     VideoCaptureSource(VideoCapture_p* p);
@@ -16,6 +22,7 @@ public:
     VideoCaptureSource(const cv::String &filename, int apiPreference);
 
     VideoCaptureSource(int index);
+
 
     raft::kstatus run() override;
 };

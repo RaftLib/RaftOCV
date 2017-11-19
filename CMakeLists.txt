@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 14)
 
 include(package.cmake)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -std=c++14 -DL1D_CACHE_LINE_SIZE=64")
 
 set(CMAKE_AUTOMOC ON)
@@ -86,7 +87,7 @@ find_package(Threads)
 find_package(Qt5Core)
 find_package(Qt5Gui)
 find_package(Qt5Widgets)
-#find_package(OpenPose REQUIRED)
+find_package(OpenPose REQUIRED)
 
 find_library(RAFT_LIB raftd)
 
@@ -105,7 +106,7 @@ IF(USE_PCL)
     target_link_libraries(RaftOCV ${PCL_LIBRARIES} OpenNI2 glfw )
 ENDIF()
 
-target_link_libraries(RaftOCV QtPropertyBrowser)
+target_link_libraries(RaftOCV QtPropertyBrowser openpose)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)

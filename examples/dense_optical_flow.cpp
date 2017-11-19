@@ -12,7 +12,6 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
 
     VideoCaptureSource src(argv[1]);
-    //NullSink<MetadataEnvelope<cv::Mat>> sink;
     DisplayFrameSink sink("Stabalize");
     UIMap m;
 

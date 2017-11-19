@@ -2,19 +2,19 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <raft>
-#include <DisplayFrameSink.h>
-#include <ConvertColorFilter.h>
-#include <StereoBMFilter.h>
+#include <ui/DisplayFrameSink.h>
+#include <imgproc/ConvertColorFilter.h>
+#include <stereo/StereoBMFilter.h>
 #include <raftinc/print.tcc>
-#include <DuplicateKernel.h>
-#include <Metadata.h>
-#include <JoinMetadataKernel.h>
-#include <StereoCalibrateKernel.h>
-#include <UndistortFilter.h>
-#include "FindChessboardCornersKernel.h"
+#include <utility/DuplicateKernel.h>
+#include <utility/Metadata.h>
+#include <utility/JoinMetadataKernel.h>
+#include <stereo/StereoCalibrateKernel.h>
+#include <imgproc/UndistortFilter.h>
+#include "calib3d/FindChessboardCornersKernel.h"
 
-#include "ROIFilter.h"
-#include "UVCSource.h"
+#include "imgproc/ROIFilter.h"
+#include "videoio/UVCSource.h"
 
 int main() {
     using p_out = raft::print< SingleCalibrationCameraResults, '\n' >;

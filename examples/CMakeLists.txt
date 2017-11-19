@@ -1,4 +1,12 @@
-SET(MAINS video_capture video_save stereo_capture stereo_calibrate video_playback camera_calibrate video_stabilization)
+SET(MAINS video_capture video_save
+        video_playback camera_calibrate video_stabilization video_bgmodel pose_tracker
+        dense_optical_flow)
+
+if(USE_PCL)
+    LIST(APPEND MAINS stereo_capture stereo_calibrate)
+ENDIF()
+
+
 FILE(COPY ps4eye_calib.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 foreach(main ${MAINS})
     add_executable(${main} ${main}.cpp)

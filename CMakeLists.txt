@@ -6,12 +6,22 @@ set(CMAKE_CXX_STANDARD 14)
 include(package.cmake)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -std=c++14 -DL1D_CACHE_LINE_SIZE=64")
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(Qt5Core)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 option(USE_ASAN "Use Address and UB sanitizers" OFF)
 option(USE_PROFILER "Use Address and UB sanitizers" OFF)
 option(BUILD_EXAMPLES "Build the example applications" ON)
 option(USE_PCL "Use PCL library" OFF)
 
-include_directories( include ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 )
+find_package(QtPropertyBrowser)
+
+include_directories( src ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 ${QtPropertyBrowser_INCLUDE_DIRS} )
 IF(USE_PROFILER)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
 ENDIF()
@@ -27,43 +37,48 @@ ENDIF()
 SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 SET(RAFTOCV_SRC
-        include/FromVector.h
-        include/VectorizeData.h
-        src/UVCSource.cpp include/UVCSource.h
-        src/ROIFilter.cpp include/ROIFilter.h
-        src/ConvertColorFilter.cpp include/ConvertColorFilter.h
-        src/DisplayFrameSink.cpp include/DisplayFrameSink.h
-        src/HeatmapFilter.cpp include/HeatmapFilter.h
-        src/UndistortFilter.cpp include/UndistortFilter.h
-        src/FindChessboardCornersKernel.cpp include/FindChessboardCornersKernel.h
-        src/Metadata.cpp include/Metadata.h
-        src/JoinMetadataKernel.cpp include/JoinMetadataKernel.h
-        src/DuplicateKernel.cpp include/DuplicateKernel.h
-        src/NullSink.cpp include/NullSink.h
-        src/StereoCalibrateKernel.cpp include/StereoCalibrateKernel.h
-        src/VideoCaptureSink.cpp include/VideoCaptureSink.h
-        src/VideoCaptureSource.cpp include/VideoCaptureSource.h
-        src/RemapFilter.cpp include/RemapFilter.h
-        src/CalibrateKernel.cpp include/CalibrateKernel.h
-        src/CombineFilter.cpp include/CombineFilter.h
-        include/DropFilter.h
-        src/StereoSubgraph.cpp include/StereoSubgraph.h
-        src/SplitFilter.cpp include/SplitFilter.h
-        include/NullSource.h
-        src/CalibrationTypes.cpp include/CalibrationTypes.h
-        include/KeyListener.h
-        src/PoolAllocator.cpp include/PoolAllocator.h
-        src/CannyEdgeKernel.cpp include/CannyEdgeKernel.h
-        include/PoseEstimator.h src/PoseEstimator.cpp
-        src/StabalizeVideo.cpp include/StabalizeVideo.h
-        DiffMask.cpp DiffMask.h include/KernelTemplate.h
-        WarpAffine.cpp WarpAffine.h
+        src/utility/FromVector.h
+        src/utility/VectorizeData.h
+        src/videoio/UVCSource.cpp src/videoio/UVCSource.h
+        src/imgproc/ROIFilter.cpp src/imgproc/ROIFilter.h
+        src/imgproc/ConvertColorFilter.cpp src/imgproc/ConvertColorFilter.h
+        src/ui/DisplayFrameSink.cpp src/ui/DisplayFrameSink.h
+        src/imgproc/HeatmapFilter.cpp src/imgproc/HeatmapFilter.h
+        src/imgproc/UndistortFilter.cpp src/imgproc/UndistortFilter.h
+        src/calib3d/FindChessboardCornersKernel.cpp src/calib3d/FindChessboardCornersKernel.h
+        src/utility/Metadata.cpp src/utility/Metadata.h
+        src/utility/JoinMetadataKernel.cpp src/utility/JoinMetadataKernel.h
+        src/utility/DuplicateKernel.cpp src/utility/DuplicateKernel.h
+        src/utility/NullSink.cpp src/utility/NullSink.h
+        src/stereo/StereoCalibrateKernel.cpp src/stereo/StereoCalibrateKernel.h
+        src/videoio/VideoCaptureSink.cpp src/videoio/VideoCaptureSink.h
+        src/videoio/VideoCaptureSource.cpp src/videoio/VideoCaptureSource.h
+        src/imgproc/RemapFilter.cpp src/imgproc/RemapFilter.h
+        src/calib3d/CalibrateKernel.cpp src/calib3d/CalibrateKernel.h
+        src/utility/CombineFilter.cpp src/utility/CombineFilter.h
+        src/utility/DropFilter.h
+        src/stereo/StereoSubgraph.cpp src/stereo/StereoSubgraph.h
+        src/imgproc/SplitFilter.cpp src/imgproc/SplitFilter.h
+        src/utility/NullSource.h
+        src/calib3d/CalibrationTypes.cpp src/calib3d/CalibrationTypes.h
+        src/ui/KeyListener.h
+        src/utility/PoolAllocator.cpp src/utility/PoolAllocator.h
+        src/imgproc/CannyEdgeKernel.cpp src/imgproc/CannyEdgeKernel.h
+        src/tracking/PoseEstimator.h src/tracking/PoseEstimator.cpp
+        src/tracking/StabalizeVideo.cpp src/tracking/StabalizeVideo.h
+        src/imgproc/DiffMask.cpp src/imgproc/DiffMask.h src/KernelTemplate.h
+        src/imgproc/WarpAffine.cpp src/imgproc/WarpAffine.h
+        src/tracking/BgModel.cpp src/tracking/BgModel.h
+        src/tracking/DenseOpticalFlow.cpp src/tracking/DenseOpticalFlow.h
+        src/ui/UIMap.cpp src/ui/UIMap.h src/ui/UIMap.ui
+        src/ui/objectcontroller.cpp src/ui/objectcontroller.h
+        src/utility/OptionalPort.cpp src/utility/OptionalPort.h
         )
 
 IF(USE_PCL)
-    LIST(APPEND RAFTOCV_SRC src/StereoBMFilter.cpp include/StereoBMFilter.h
-            src/PointCloudFilter.cpp include/PointCloudFilter.h
-            src/PointCloudViewer.cpp include/PointCloudViewer.h)
+    LIST(APPEND RAFTOCV_SRC src/stereo/StereoBMFilter.cpp src/stereo/StereoBMFilter.h
+            src/pcl/PointCloudFilter.cpp src/pcl/PointCloudFilter.h
+            src/pcl/PointCloudViewer.cpp src/pcl/PointCloudViewer.h)
 ENDIF()
 add_library(RaftOCV STATIC ${RAFTOCV_SRC})
 
@@ -75,12 +90,12 @@ find_package(Qt5Widgets)
 
 find_library(RAFT_LIB raftd)
 
-message("!!!!!!! ${RAFT_LIB}")
 target_link_libraries(RaftOCV
         ${RAFT_LIB}
         Qt5::Core Qt5::Gui Qt5::Widgets
         v4l2
-        opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs opencv_calib3d opencv_video opencv_videoio opencv_cudabgsegm
+        opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs opencv_calib3d opencv_video opencv_videoio
+        opencv_cudabgsegm opencv_cudaoptflow
         ${PCL_LIBRARIES}
         GL
         ${CMAKE_THREAD_LIBS_INIT})
@@ -90,7 +105,7 @@ IF(USE_PCL)
     target_link_libraries(RaftOCV ${PCL_LIBRARIES} OpenNI2 glfw )
 ENDIF()
 
-target_link_libraries(RaftOCV)
+target_link_libraries(RaftOCV QtPropertyBrowser)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)

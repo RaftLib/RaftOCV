@@ -1,9 +1,9 @@
 #include <raft>
-#include <ConvertColorFilter.h>
-#include <VideoCaptureSink.h>
+#include <imgproc/ConvertColorFilter.h>
+#include <videoio/VideoCaptureSink.h>
 #include <opencv2/videoio/videoio_c.h>
 
-#include "UVCSource.h"
+#include "videoio/UVCSource.h"
 
 int main(int argc, const char** argv) {
     const char* videoSrc = "/dev/video0";

@@ -1,9 +1,9 @@
 #include <raft>
-#include <DisplayFrameSink.h>
-#include <ConvertColorFilter.h>
+#include <ui/DisplayFrameSink.h>
+#include <imgproc/ConvertColorFilter.h>
 
-#include "UVCSource.h"
-#include "PointCloudFilter.h"
+#include "videoio/UVCSource.h"
+#include "pcl/PointCloudFilter.h"
 
 int main(int argc, const char** argv) {
     const char* videoSrc = "/dev/video0";

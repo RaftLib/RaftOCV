@@ -2,23 +2,23 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <raft>
-#include <DisplayFrameSink.h>
-#include <ConvertColorFilter.h>
-#include <StereoBMFilter.h>
+#include <ui/DisplayFrameSink.h>
+#include <imgproc/ConvertColorFilter.h>
+#include <stereo/StereoBMFilter.h>
 #include <raftinc/print.tcc>
-#include <DuplicateKernel.h>
-#include <Metadata.h>
-#include <JoinMetadataKernel.h>
-#include <StereoCalibrateKernel.h>
-#include <UndistortFilter.h>
-#include <HeatmapFilter.h>
-#include <StereoSubgraph.h>
-#include "FindChessboardCornersKernel.h"
+#include <Utility/DuplicateKernel.h>
+#include <Utility/Metadata.h>
+#include <Utility/JoinMetadataKernel.h>
+#include <stereo/StereoCalibrateKernel.h>
+#include <imgproc/UndistortFilter.h>
+#include <imgproc/HeatmapFilter.h>
+#include <stereo/StereoSubgraph.h>
+#include "calib3d/FindChessboardCornersKernel.h"
 
-#include "ROIFilter.h"
-#include "UVCSource.h"
-#include "CombineFilter.h"
-#include "PoolAllocator.h"
+#include "imgproc/ROIFilter.h"
+#include "videoio/UVCSource.h"
+#include "Utility/CombineFilter.h"
+#include "../src/utility/PoolAllocator.h"
 
 int main() {
     SetupOpenCVPoolAllocator();

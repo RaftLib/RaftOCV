@@ -1,2 +1,0 @@
-
-#include "NullSink.h"

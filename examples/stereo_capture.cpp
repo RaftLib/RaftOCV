@@ -1,17 +1,17 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <raft>
-#include <DisplayFrameSink.h>
-#include <ConvertColorFilter.h>
-#include <HeatmapFilter.h>
+#include <ui/DisplayFrameSink.h>
+#include <imgproc/ConvertColorFilter.h>
+#include <imgproc/HeatmapFilter.h>
 
-#include "ROIFilter.h"
-#include "UVCSource.h"
-#include "PointCloudFilter.h"
-#include <UndistortFilter.h>
-#include <StereoCalibrateKernel.h>
-#include <StereoSubgraph.h>
-#include <PointCloudViewer.h>
-#include "PoolAllocator.h"
+#include "imgproc/ROIFilter.h"
+#include "videoio/UVCSource.h"
+#include "pcl/PointCloudFilter.h"
+#include <imgproc/UndistortFilter.h>
+#include <stereo/StereoCalibrateKernel.h>
+#include <stereo/StereoSubgraph.h>
+#include <pcl/PointCloudViewer.h>
+#include "../src/utility/PoolAllocator.h"
 
 int main(int argc, const char** argv) {
     SetupOpenCVPoolAllocator();

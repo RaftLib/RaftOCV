@@ -1,17 +1,17 @@
+#include <ui/DisplayFrameSink.h>
 #include <raft>
-#include <DisplayFrameSink.h>
-#include <ConvertColorFilter.h>
-#include <VideoCaptureSource.h>
-#include <PoseEstimator.h>
-#include <StabalizeVideo.h>
-#include <UVCSource.h>
-#include <VectorizeData.h>
+#include <imgproc/ConvertColorFilter.h>
+#include <videoio/VideoCaptureSource.h>
+#include <tracking/PoseEstimator.h>
+#include <tracking/StabalizeVideo.h>
+#include <videoio/UVCSource.h>
+#include <utility/VectorizeData.h>
 #include <opencv/cv.hpp>
-#include <VideoCaptureSink.h>
-#include "CannyEdgeKernel.h"
-#include "../DiffMask.h"
-#include "../WarpAffine.h"
-#include "FromVector.h"
+#include <videoio/VideoCaptureSink.h>
+#include "imgproc/CannyEdgeKernel.h"
+#include "../src/imgproc/DiffMask.h"
+#include "../src/imgproc/WarpAffine.h"
+#include "utility/FromVector.h"
 
 static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
                                              cv::Size frameSize,
@@ -54,6 +54,7 @@ static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
     }
 
     targetSize = cv::Size(maxx-minx, maxy-miny);
+    return newTxs;
 }
 
 int main(int argc, char** argv) {
@@ -62,7 +63,7 @@ int main(int argc, char** argv) {
     int frameCap = -1;
     {
         VideoCaptureSource src(argv[1]);
-
+        DisplayFrameSink sink("Stabalize");
         raft::map m;
 
         src.frameCap = frameCap;
@@ -73,6 +74,7 @@ int main(int argc, char** argv) {
         DiffMask diff;
 
         m += src >> flow["0"].txOut() >> txs;
+        m += flow["0"].videoOut() >> sink;
 
         m.exe();
 
@@ -84,7 +86,7 @@ int main(int argc, char** argv) {
 
     {
         VideoCaptureSource src(argv[1]);
-        VideoCaptureSink sink(std::string(argv[1]) + ".stabalized.mjpg", CV_FOURCC('M', 'J', 'P', 'G'));
+        VideoCaptureSink sink(std::string(argv[1]) + ".stabalized.avi", CV_FOURCC('M', 'J', 'P', 'G'));
 
         FromVector_<cv::Mat> txsSrc(newTxs);
 

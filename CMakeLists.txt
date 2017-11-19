@@ -22,7 +22,7 @@ option(USE_PCL "Use PCL library" OFF)
 
 find_package(QtPropertyBrowser)
 
-include_directories( src ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 ${QtPropertyBrowser_INCLUDE_DIRS} )
+include_directories( src src/ui ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 ${QtPropertyBrowser_INCLUDE_DIRS} )
 IF(USE_PROFILER)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
 ENDIF()
@@ -111,3 +111,22 @@ target_link_libraries(RaftOCV QtPropertyBrowser openpose)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+install(TARGETS RaftOCV
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+
+install(DIRECTORY src/ DESTINATION include/RaftOCV
+        PATTERN "**/*.h"
+        PATTERN "*.c*" EXCLUDE
+        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+        GROUP_EXECUTE GROUP_READ)
+
+# Compute installation prefix relative to this file
+configure_file(
+        ${CMAKE_SOURCE_DIR}/cmake/RaftOCVConfig.cmake.in
+        ${CMAKE_BINARY_DIR}/cmake/RaftOCVConfig.cmake @ONLY)
+
+install(FILES ${CMAKE_BINARY_DIR}/cmake/RaftOCVConfig.cmake
+        DESTINATION lib/cmake)

@@ -114,6 +114,7 @@ if(BUILD_EXAMPLES)
 endif()
 
 install(TARGETS RaftOCV
+        EXPORT RaftOCV
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
@@ -131,3 +132,5 @@ configure_file(
 
 install(FILES ${CMAKE_BINARY_DIR}/cmake/RaftOCVConfig.cmake
         DESTINATION lib/cmake)
+
+install(EXPORT RaftOCV DESTINATION lib/RaftOCV)

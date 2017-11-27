@@ -1,6 +1,7 @@
+cmake_minimum_required(VERSION 3.5)
+
 project(RaftOCV C CXX)
 
-cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 14)
 
 include(package.cmake)

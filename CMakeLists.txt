@@ -81,7 +81,6 @@ IF(USE_PCL)
             src/pcl/PointCloudFilter.cpp src/pcl/PointCloudFilter.h
             src/pcl/PointCloudViewer.cpp src/pcl/PointCloudViewer.h)
 ENDIF()
-add_library(RaftOCV STATIC ${RAFTOCV_SRC})
 
 find_package(Threads)
 find_package(Qt5Core)
@@ -89,7 +88,9 @@ find_package(Qt5Gui)
 find_package(Qt5Widgets)
 find_package(OpenPose REQUIRED)
 
-find_library(RAFT_LIB raftd)
+find_library(RAFT_LIB raft raftd)
+
+add_library(RaftOCV STATIC ${RAFTOCV_SRC})
 
 target_link_libraries(RaftOCV
         ${RAFT_LIB}

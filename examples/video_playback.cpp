@@ -1,7 +1,5 @@
 #include <raft>
-#include <ui/DisplayFrameSink.h>
-#include <imgproc/ConvertColorFilter.h>
-#include <videoio/VideoCaptureSource.h>
+#include <RaftOCV.h>
 
 int main(int argc, char** argv) {
     VideoCaptureSource src(argv[1]);

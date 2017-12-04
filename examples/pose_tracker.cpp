@@ -1,7 +1,7 @@
-#include <ui/DisplayFrameSink.h>
-#include <imgproc/ConvertColorFilter.h>
-#include <videoio/VideoCaptureSource.h>
-#include <tracking/PoseEstimator.h>
+#include <RaftOCV/ui/DisplayFrameSink.h>
+#include <RaftOCV/imgproc/ConvertColorFilter.h>
+#include <RaftOCV/videoio/VideoCaptureSource.h>
+#include <RaftOCV/tracking/PoseEstimator.h>
 #include <opencv/cv.hpp>
 
 cv::Size targetSize;

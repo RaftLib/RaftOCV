@@ -1,15 +1,19 @@
 # Compute and install package configuration and version files
 get_filename_component(_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_prefix "${_dir}/../.." ABSOLUTE)
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
 
 # Import the targets
 include("${_prefix}/lib/RaftOCV/RaftOCV.cmake")
 
 # Report other information
 set(RaftOCV_INCLUDE_DIRS "${_prefix}/include/RaftOCV")
-
 set(RaftOCV_LIBS "RaftOCV")
 
 if (RaftOCV_INCLUDE_DIRS AND RaftOCV_LIBS)
   set(RaftOCV_FOUND 1)
+
+  @CGET_DEPENDENCY_CONFIG@
 endif (RaftOCV_INCLUDE_DIRS AND RaftOCV_LIBS)

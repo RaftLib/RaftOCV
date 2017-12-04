@@ -1,10 +1,7 @@
 #include <raft>
-#include <imgproc/ConvertColorFilter.h>
-#include <videoio/VideoCaptureSource.h>
+#include <RaftOCV.h>
 #include <opencv/cv.hpp>
-#include <ui/DisplayFrameSink.h>
-#include "../src/tracking/BgModel.h"
-#include "../src/imgproc/DiffMask.h"
+
 
 int main(int argc, char** argv) {
     BgModel bg;

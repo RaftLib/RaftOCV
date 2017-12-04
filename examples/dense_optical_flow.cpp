@@ -1,10 +1,10 @@
-#include <ui/DisplayFrameSink.h>
-#include <videoio/VideoCaptureSource.h>
+#include <RaftOCV/ui/DisplayFrameSink.h>
+#include <RaftOCV/videoio/VideoCaptureSource.h>
 #include <QtWidgets/QApplication>
-#include <utility/NullSink.h>
-#include <utility/Metadata.h>
-#include "tracking/DenseOpticalFlow.h"
-#include "ui/UIMap.h"
+#include <RaftOCV/utility/NullSink.h>
+#include <RaftOCV/utility/Metadata.h>
+#include "RaftOCV/tracking/DenseOpticalFlow.h"
+#include "RaftOCV/ui/UIMap.h"
 
 cv::Size targetSize;
 

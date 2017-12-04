@@ -23,7 +23,7 @@ option(USE_PCL "Use PCL library" OFF)
 
 find_package(QtPropertyBrowser)
 
-include_directories( src src/ui ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 ${QtPropertyBrowser_INCLUDE_DIRS} )
+include_directories( src src/RaftOCV/ui ${CGET_INSTALL_DIR}/include/pcl-1.8 /usr/include/eigen3 ${QtPropertyBrowser_INCLUDE_DIRS} )
 IF(USE_PROFILER)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
 ENDIF()
@@ -39,48 +39,49 @@ ENDIF()
 SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 SET(RAFTOCV_SRC
-        src/utility/FromVector.h
-        src/utility/VectorizeData.h
-        src/videoio/UVCSource.cpp src/videoio/UVCSource.h
-        src/imgproc/ROIFilter.cpp src/imgproc/ROIFilter.h
-        src/imgproc/ConvertColorFilter.cpp src/imgproc/ConvertColorFilter.h
-        src/ui/DisplayFrameSink.cpp src/ui/DisplayFrameSink.h
-        src/imgproc/HeatmapFilter.cpp src/imgproc/HeatmapFilter.h
-        src/imgproc/UndistortFilter.cpp src/imgproc/UndistortFilter.h
-        src/calib3d/FindChessboardCornersKernel.cpp src/calib3d/FindChessboardCornersKernel.h
-        src/utility/Metadata.cpp src/utility/Metadata.h
-        src/utility/JoinMetadataKernel.cpp src/utility/JoinMetadataKernel.h
-        src/utility/DuplicateKernel.cpp src/utility/DuplicateKernel.h
-        src/utility/NullSink.cpp src/utility/NullSink.h
-        src/stereo/StereoCalibrateKernel.cpp src/stereo/StereoCalibrateKernel.h
-        src/videoio/VideoCaptureSink.cpp src/videoio/VideoCaptureSink.h
-        src/videoio/VideoCaptureSource.cpp src/videoio/VideoCaptureSource.h
-        src/imgproc/RemapFilter.cpp src/imgproc/RemapFilter.h
-        src/calib3d/CalibrateKernel.cpp src/calib3d/CalibrateKernel.h
-        src/utility/CombineFilter.cpp src/utility/CombineFilter.h
-        src/utility/DropFilter.h
-        src/stereo/StereoSubgraph.cpp src/stereo/StereoSubgraph.h
-        src/imgproc/SplitFilter.cpp src/imgproc/SplitFilter.h
-        src/utility/NullSource.h
-        src/calib3d/CalibrationTypes.cpp src/calib3d/CalibrationTypes.h
-        src/ui/KeyListener.h
-        src/utility/PoolAllocator.cpp src/utility/PoolAllocator.h
-        src/imgproc/CannyEdgeKernel.cpp src/imgproc/CannyEdgeKernel.h
-        src/tracking/PoseEstimator.h src/tracking/PoseEstimator.cpp
-        src/tracking/StabalizeVideo.cpp src/tracking/StabalizeVideo.h
-        src/imgproc/DiffMask.cpp src/imgproc/DiffMask.h src/KernelTemplate.h
-        src/imgproc/WarpAffine.cpp src/imgproc/WarpAffine.h
-        src/tracking/BgModel.cpp src/tracking/BgModel.h
-        src/tracking/DenseOpticalFlow.cpp src/tracking/DenseOpticalFlow.h
-        src/ui/UIMap.cpp src/ui/UIMap.h src/ui/UIMap.ui
-        src/ui/objectcontroller.cpp src/ui/objectcontroller.h
-        src/utility/OptionalPort.cpp src/utility/OptionalPort.h
+        src/RaftOCV.h
+        src/RaftOCV/utility/FromVector.h
+        src/RaftOCV/utility/VectorizeData.h
+        src/RaftOCV/videoio/UVCSource.cpp src/RaftOCV/videoio/UVCSource.h
+        src/RaftOCV/imgproc/ROIFilter.cpp src/RaftOCV/imgproc/ROIFilter.h
+        src/RaftOCV/imgproc/ConvertColorFilter.cpp src/RaftOCV/imgproc/ConvertColorFilter.h
+        src/RaftOCV/ui/DisplayFrameSink.cpp src/RaftOCV/ui/DisplayFrameSink.h
+        src/RaftOCV/imgproc/HeatmapFilter.cpp src/RaftOCV/imgproc/HeatmapFilter.h
+        src/RaftOCV/imgproc/UndistortFilter.cpp src/RaftOCV/imgproc/UndistortFilter.h
+        src/RaftOCV/calib3d/FindChessboardCornersKernel.cpp src/RaftOCV/calib3d/FindChessboardCornersKernel.h
+        src/RaftOCV/utility/Metadata.cpp src/RaftOCV/utility/Metadata.h
+        src/RaftOCV/utility/JoinMetadataKernel.cpp src/RaftOCV/utility/JoinMetadataKernel.h
+        src/RaftOCV/utility/DuplicateKernel.cpp src/RaftOCV/utility/DuplicateKernel.h
+        src/RaftOCV/utility/NullSink.cpp src/RaftOCV/utility/NullSink.h
+        src/RaftOCV/stereo/StereoCalibrateKernel.cpp src/RaftOCV/stereo/StereoCalibrateKernel.h
+        src/RaftOCV/videoio/VideoCaptureSink.cpp src/RaftOCV/videoio/VideoCaptureSink.h
+        src/RaftOCV/videoio/VideoCaptureSource.cpp src/RaftOCV/videoio/VideoCaptureSource.h
+        src/RaftOCV/imgproc/RemapFilter.cpp src/RaftOCV/imgproc/RemapFilter.h
+        src/RaftOCV/calib3d/CalibrateKernel.cpp src/RaftOCV/calib3d/CalibrateKernel.h
+        src/RaftOCV/utility/CombineFilter.cpp src/RaftOCV/utility/CombineFilter.h
+        src/RaftOCV/utility/DropFilter.h
+        src/RaftOCV/stereo/StereoSubgraph.cpp src/RaftOCV/stereo/StereoSubgraph.h
+        src/RaftOCV/imgproc/SplitFilter.cpp src/RaftOCV/imgproc/SplitFilter.h
+        src/RaftOCV/utility/NullSource.h
+        src/RaftOCV/calib3d/CalibrationTypes.cpp src/RaftOCV/calib3d/CalibrationTypes.h
+        src/RaftOCV/ui/KeyListener.h
+        src/RaftOCV/utility/PoolAllocator.cpp src/RaftOCV/utility/PoolAllocator.h
+        src/RaftOCV/imgproc/CannyEdgeKernel.cpp src/RaftOCV/imgproc/CannyEdgeKernel.h
+        src/RaftOCV/tracking/PoseEstimator.h src/RaftOCV/tracking/PoseEstimator.cpp
+        src/RaftOCV/tracking/StabalizeVideo.cpp src/RaftOCV/tracking/StabalizeVideo.h
+        src/RaftOCV/imgproc/DiffMask.cpp src/RaftOCV/imgproc/DiffMask.h src/KernelTemplate.h
+        src/RaftOCV/imgproc/WarpAffine.cpp src/RaftOCV/imgproc/WarpAffine.h
+        src/RaftOCV/tracking/BgModel.cpp src/RaftOCV/tracking/BgModel.h
+        src/RaftOCV/tracking/DenseOpticalFlow.cpp src/RaftOCV/tracking/DenseOpticalFlow.h
+        src/RaftOCV/ui/UIMap.cpp src/RaftOCV/ui/UIMap.h src/RaftOCV/ui/UIMap.ui
+        src/RaftOCV/ui/objectcontroller.cpp src/RaftOCV/ui/objectcontroller.h
+        src/RaftOCV/utility/OptionalPort.cpp src/RaftOCV/utility/OptionalPort.h
         )
 
 IF(USE_PCL)
-    LIST(APPEND RAFTOCV_SRC src/stereo/StereoBMFilter.cpp src/stereo/StereoBMFilter.h
-            src/pcl/PointCloudFilter.cpp src/pcl/PointCloudFilter.h
-            src/pcl/PointCloudViewer.cpp src/pcl/PointCloudViewer.h)
+    LIST(APPEND RAFTOCV_SRC src/RaftOCV/stereo/StereoBMFilter.cpp src/RaftOCV/stereo/StereoBMFilter.h
+            src/RaftOCV/pcl/PointCloudFilter.cpp src/RaftOCV/pcl/PointCloudFilter.h
+            src/RaftOCV/pcl/PointCloudViewer.cpp src/RaftOCV/pcl/PointCloudViewer.h)
 ENDIF()
 
 find_package(Threads)
@@ -90,15 +91,16 @@ find_package(Qt5Widgets)
 find_package(OpenPose REQUIRED)
 
 find_library(RAFT_LIB raft raftd)
+find_path(RAFT_LIB_INCLUDES raft HINTS ${CGET_RaftLib_INSTALL_ROOT})
 
 add_library(RaftOCV STATIC ${RAFTOCV_SRC})
+target_include_directories(RaftOCV PUBLIC ${RAFT_LIB_INCLUDES} ${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(RaftOCV
         ${RAFT_LIB}
         Qt5::Core Qt5::Gui Qt5::Widgets
         v4l2
-        opencv_core opencv_highgui opencv_imgproc opencv_imgcodecs opencv_calib3d opencv_video opencv_videoio
-        opencv_cudabgsegm opencv_cudaoptflow
+	${OpenCV_LIBS}	
         ${PCL_LIBRARIES}
         GL
         ${CMAKE_THREAD_LIBS_INIT})
@@ -110,6 +112,8 @@ ENDIF()
 
 target_link_libraries(RaftOCV QtPropertyBrowser openpose)
 
+
+
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
@@ -120,7 +124,7 @@ install(TARGETS RaftOCV
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 
-install(DIRECTORY src/ DESTINATION include/RaftOCV
+install(DIRECTORY src/ DESTINATION include
         PATTERN "**/*.h"
         PATTERN "*.c*" EXCLUDE
         PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ

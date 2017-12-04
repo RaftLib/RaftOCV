@@ -1,17 +1,17 @@
-#include <ui/DisplayFrameSink.h>
+#include <RaftOCV/ui/DisplayFrameSink.h>
 #include <raft>
-#include <imgproc/ConvertColorFilter.h>
-#include <videoio/VideoCaptureSource.h>
-#include <tracking/PoseEstimator.h>
-#include <tracking/StabalizeVideo.h>
-#include <videoio/UVCSource.h>
-#include <utility/VectorizeData.h>
+#include <RaftOCV/imgproc/ConvertColorFilter.h>
+#include <RaftOCV/videoio/VideoCaptureSource.h>
+#include <RaftOCV/tracking/PoseEstimator.h>
+#include <RaftOCV/tracking/StabalizeVideo.h>
+#include <RaftOCV/videoio/UVCSource.h>
+#include <RaftOCV/utility/VectorizeData.h>
 #include <opencv/cv.hpp>
-#include <videoio/VideoCaptureSink.h>
-#include "imgproc/CannyEdgeKernel.h"
-#include "../src/imgproc/DiffMask.h"
-#include "../src/imgproc/WarpAffine.h"
-#include "utility/FromVector.h"
+#include <RaftOCV/videoio/VideoCaptureSink.h>
+#include "RaftOCV/imgproc/CannyEdgeKernel.h"
+#include "RaftOCV/imgproc/DiffMask.h"
+#include "RaftOCV/imgproc/WarpAffine.h"
+#include "RaftOCV/utility/FromVector.h"
 
 static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
                                              cv::Size frameSize,

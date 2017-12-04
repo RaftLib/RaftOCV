@@ -88,7 +88,6 @@ find_package(Threads)
 find_package(Qt5Core)
 find_package(Qt5Gui)
 find_package(Qt5Widgets)
-find_package(OpenPose REQUIRED)
 
 find_library(RAFT_LIB raft raftd)
 find_path(RAFT_LIB_INCLUDES raft HINTS ${CGET_RaftLib_INSTALL_ROOT})

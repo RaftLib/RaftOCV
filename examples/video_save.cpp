@@ -1,5 +1,5 @@
 #include <raft>
-#include <RaftOCV/imgproc/ConvertColorFilter.h>
+#include <RaftOCV/imgproc/ConvertColor.h>
 #include <RaftOCV/videoio/VideoCaptureSink.h>
 #include <opencv2/videoio/videoio_c.h>
 

@@ -44,7 +44,7 @@ SET(RAFTOCV_SRC
         src/RaftOCV/utility/VectorizeData.h
         src/RaftOCV/videoio/UVCSource.cpp src/RaftOCV/videoio/UVCSource.h
         src/RaftOCV/imgproc/ROIFilter.cpp src/RaftOCV/imgproc/ROIFilter.h
-        src/RaftOCV/imgproc/ConvertColorFilter.cpp src/RaftOCV/imgproc/ConvertColorFilter.h
+        src/RaftOCV/imgproc/ConvertColor.cpp src/RaftOCV/imgproc/ConvertColor.h
         src/RaftOCV/ui/DisplayFrameSink.cpp src/RaftOCV/ui/DisplayFrameSink.h
         src/RaftOCV/imgproc/HeatmapFilter.cpp src/RaftOCV/imgproc/HeatmapFilter.h
         src/RaftOCV/imgproc/UndistortFilter.cpp src/RaftOCV/imgproc/UndistortFilter.h
@@ -76,7 +76,8 @@ SET(RAFTOCV_SRC
         src/RaftOCV/ui/UIMap.cpp src/RaftOCV/ui/UIMap.h src/RaftOCV/ui/UIMap.ui
         src/RaftOCV/ui/objectcontroller.cpp src/RaftOCV/ui/objectcontroller.h
         src/RaftOCV/utility/OptionalPort.cpp src/RaftOCV/utility/OptionalPort.h
-        )
+        src/RaftOCV/imgproc/ApplyFilter.cpp src/RaftOCV/imgproc/ApplyFilter.h
+        src/RaftOCV/utility/FunctorFilter.h)
 
 IF(USE_PCL)
     LIST(APPEND RAFTOCV_SRC src/RaftOCV/stereo/StereoBMFilter.cpp src/RaftOCV/stereo/StereoBMFilter.h

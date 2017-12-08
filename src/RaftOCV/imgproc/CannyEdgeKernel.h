@@ -1,16 +1,17 @@
 #pragma once
 
 #include <raft>
+#include <RaftOCV/utility/FunctorFilter.h>
 
-class CannyEdgeKernel : public raft::kernel{
+class CannyEdgeFunctor {
  public:
     double threshold1;
     double threshold2;
     int apertureSize = 3;
     bool L2gradient = false;
 
-    raft::kstatus run() override;
-
-    CannyEdgeKernel(double threshold1 = 100, double threshold2 = 100, int apertureSize = 3, bool L2gradient = false);
+    CannyEdgeFunctor(double threshold1 = 100, double threshold2 = 100, int apertureSize = 3, bool L2gradient = false);
+    MetadataEnvelope<cv::Mat> operator()(const MetadataEnvelope<cv::Mat>& img_in);
 };
 
+typedef FunctorFilter<CannyEdgeFunctor> CannyEdgeKernel;

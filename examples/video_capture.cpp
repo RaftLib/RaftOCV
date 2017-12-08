@@ -1,6 +1,6 @@
 #include <raft>
 #include <RaftOCV/ui/DisplayFrameSink.h>
-#include <RaftOCV/imgproc/ConvertColorFilter.h>
+#include <RaftOCV/imgproc/ConvertColor.h>
 
 #include "RaftOCV/videoio/UVCSource.h"
 #include "RaftOCV/pcl/PointCloudFilter.h"

@@ -9,7 +9,7 @@
 #include "RaftOCV/imgproc/WarpAffine.h"
 #include "RaftOCV/imgproc/DiffMask.h"
 #include "RaftOCV/imgproc/UndistortFilter.h"
-#include "RaftOCV/imgproc/ConvertColorFilter.h"
+#include "RaftOCV/imgproc/ConvertColor.h"
 #include "RaftOCV/imgproc/SplitFilter.h"
 #include "RaftOCV/imgproc/RemapFilter.h"
 #include "RaftOCV/imgproc/ROIFilter.h"

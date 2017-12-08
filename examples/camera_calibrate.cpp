@@ -4,7 +4,7 @@
 #include <raft>
 #include <raftinc/print.tcc>
 #include <RaftOCV/calib3d/CalibrationTypes.h>
-#include <RaftOCV/imgproc/ConvertColorFilter.h>
+#include <RaftOCV/imgproc/ConvertColor.h>
 #include <RaftOCV/videoio/UVCSource.h>
 #include <RaftOCV/ui/DisplayFrameSink.h>
 #include <RaftOCV/imgproc/UndistortFilter.h>

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <raft>
 #include <opencv2/core/types.hpp>
 

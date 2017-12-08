@@ -6,6 +6,7 @@
 #include "RaftOCV/pcl/PointCloudViewer.h"
 #include "RaftOCV/pcl/PointCloudFilter.h"
 #endif
+#include "RaftOCV/imgproc/ApplyFilter.h"
 #include "RaftOCV/imgproc/WarpAffine.h"
 #include "RaftOCV/imgproc/DiffMask.h"
 #include "RaftOCV/imgproc/UndistortFilter.h"

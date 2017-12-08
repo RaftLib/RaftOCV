@@ -1,3 +1,5 @@
+#pragma once
+
 #include <raft>
 
 class DisplayFrameSink : public raft::kernel {

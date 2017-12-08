@@ -1,0 +1,12 @@
+ADD_SOURCES(
+        ROIFilter
+        ConvertColor
+        HeatmapFilter
+        UndistortFilter
+        RemapFilter
+        SplitFilter
+        CannyEdgeKernel
+        DiffMask
+        WarpAffine
+        ApplyFilter
+)

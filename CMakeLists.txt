@@ -38,46 +38,17 @@ ENDIF()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 
-SET(RAFTOCV_SRC
-        src/RaftOCV.h
-        src/RaftOCV/utility/FromVector.h
-        src/RaftOCV/utility/VectorizeData.h
-        src/RaftOCV/videoio/UVCSource.cpp src/RaftOCV/videoio/UVCSource.h
-        src/RaftOCV/imgproc/ROIFilter.cpp src/RaftOCV/imgproc/ROIFilter.h
-        src/RaftOCV/imgproc/ConvertColor.cpp src/RaftOCV/imgproc/ConvertColor.h
-        src/RaftOCV/ui/DisplayFrameSink.cpp src/RaftOCV/ui/DisplayFrameSink.h
-        src/RaftOCV/imgproc/HeatmapFilter.cpp src/RaftOCV/imgproc/HeatmapFilter.h
-        src/RaftOCV/imgproc/UndistortFilter.cpp src/RaftOCV/imgproc/UndistortFilter.h
-        src/RaftOCV/calib3d/FindChessboardCornersKernel.cpp src/RaftOCV/calib3d/FindChessboardCornersKernel.h
-        src/RaftOCV/utility/Metadata.cpp src/RaftOCV/utility/Metadata.h
-        src/RaftOCV/utility/JoinMetadataKernel.cpp src/RaftOCV/utility/JoinMetadataKernel.h
-        src/RaftOCV/utility/DuplicateKernel.cpp src/RaftOCV/utility/DuplicateKernel.h
-        src/RaftOCV/utility/NullSink.cpp src/RaftOCV/utility/NullSink.h
-        src/RaftOCV/stereo/StereoCalibrateKernel.cpp src/RaftOCV/stereo/StereoCalibrateKernel.h
-        src/RaftOCV/videoio/VideoCaptureSink.cpp src/RaftOCV/videoio/VideoCaptureSink.h
-        src/RaftOCV/videoio/VideoCaptureSource.cpp src/RaftOCV/videoio/VideoCaptureSource.h
-        src/RaftOCV/imgproc/RemapFilter.cpp src/RaftOCV/imgproc/RemapFilter.h
-        src/RaftOCV/calib3d/CalibrateKernel.cpp src/RaftOCV/calib3d/CalibrateKernel.h
-        src/RaftOCV/utility/CombineFilter.cpp src/RaftOCV/utility/CombineFilter.h
-        src/RaftOCV/utility/DropFilter.h
-        src/RaftOCV/stereo/StereoSubgraph.cpp src/RaftOCV/stereo/StereoSubgraph.h
-        src/RaftOCV/imgproc/SplitFilter.cpp src/RaftOCV/imgproc/SplitFilter.h
-        src/RaftOCV/utility/NullSource.h
-        src/RaftOCV/calib3d/CalibrationTypes.cpp src/RaftOCV/calib3d/CalibrationTypes.h
-        src/RaftOCV/ui/KeyListener.h
-        src/RaftOCV/utility/PoolAllocator.cpp src/RaftOCV/utility/PoolAllocator.h
-        src/RaftOCV/imgproc/CannyEdgeKernel.cpp src/RaftOCV/imgproc/CannyEdgeKernel.h
-        src/RaftOCV/tracking/PoseEstimator.h src/RaftOCV/tracking/PoseEstimator.cpp
-        src/RaftOCV/tracking/StabalizeVideo.cpp src/RaftOCV/tracking/StabalizeVideo.h
-        src/RaftOCV/imgproc/DiffMask.cpp src/RaftOCV/imgproc/DiffMask.h src/KernelTemplate.h
-        src/RaftOCV/imgproc/WarpAffine.cpp src/RaftOCV/imgproc/WarpAffine.h
-        src/RaftOCV/tracking/BgModel.cpp src/RaftOCV/tracking/BgModel.h
-        src/RaftOCV/tracking/DenseOpticalFlow.cpp src/RaftOCV/tracking/DenseOpticalFlow.h
-        src/RaftOCV/ui/UIMap.cpp src/RaftOCV/ui/UIMap.h src/RaftOCV/ui/UIMap.ui
-        src/RaftOCV/ui/objectcontroller.cpp src/RaftOCV/ui/objectcontroller.h
-        src/RaftOCV/utility/OptionalPort.cpp src/RaftOCV/utility/OptionalPort.h
-        src/RaftOCV/imgproc/ApplyFilter.cpp src/RaftOCV/imgproc/ApplyFilter.h
-        src/RaftOCV/utility/FunctorFilter.h)
+macro(ADD_SOURCES)
+    foreach(src ${ARGV})
+       list(APPEND RAFTOCV_SRC ${CMAKE_CURRENT_SOURCE_DIR}/${src})
+        message("Adding ${CMAKE_CURRENT_SOURCE_DIR}/${src}")
+    endforeach ()
+    SET(RAFTOCV_SRC ${RAFTOCV_SRC} PARENT_SCOPE)
+endmacro()
+
+SET(RAFTOCV_SRC src/RaftOCV.h)
+
+add_subdirectory(src/RaftOCV)
 
 IF(USE_PCL)
     LIST(APPEND RAFTOCV_SRC src/RaftOCV/stereo/StereoBMFilter.cpp src/RaftOCV/stereo/StereoBMFilter.h

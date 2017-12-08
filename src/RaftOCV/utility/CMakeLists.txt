@@ -1,0 +1,14 @@
+ADD_SOURCES(
+        FromVector
+        VectorizeData
+        Metadata
+        JoinMetadataKernel
+        DuplicateKernel
+        NullSink
+        CombineFilter
+        DropFilter
+        NullSource
+        PoolAllocator
+        OptionalPort
+        FunctorFilter
+)

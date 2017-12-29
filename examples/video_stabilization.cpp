@@ -13,7 +13,7 @@
 #include "RaftOCV/imgproc/WarpAffine.h"
 #include "RaftOCV/utility/FromVector.h"
 
-static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
+static std::vector<cv::UMat> CenterTransforms(const std::vector<cv::UMat>& txs,
                                              cv::Size frameSize,
                                              cv::Size& targetSize) {
 
@@ -27,10 +27,10 @@ static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
                         cv::Vec3f(0, frameSize.height, 1),
                         cv::Vec3f(frameSize.width, frameSize.height, 1)
         };
-        for(auto pt : bounds) {
-            std::cout << tx << "x" << pt << std::endl;
-            auto npt = (cv::Vec3f)(cv::Mat)(tx.inv(cv::DECOMP_SVD) * cv::Mat(pt));
-            std::cout << npt << std::endl;
+        for(auto& pt : bounds) {
+            auto itx = tx.inv(cv::DECOMP_SVD);
+            auto result = itx.getMat(cv::ACCESS_READ) * cv::Mat(pt);
+            auto npt = (cv::Vec3f)(cv::Mat)result;
             minx = std::min(minx, npt[0]);
             maxx = std::max(maxx, npt[0]);
             miny = std::min(miny, npt[1]);
@@ -39,7 +39,7 @@ static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
     }
 
     auto newTxs = txs;
-    newTxs.insert(newTxs.begin(), cv::Mat_<float>::eye(3, 3));
+    newTxs.insert(newTxs.begin(), ((cv::Mat)cv::Mat_<float>::eye(3, 3)).getUMat(cv::ACCESS_READ));
 
     cv::Mat_<float> adjust = cv::Mat::eye(3,3, CV_32F);
     adjust(0, 2) = minx;
@@ -49,7 +49,9 @@ static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
         std::cerr << adjust << std::endl;
 
         std::cerr << newTx << std::endl;
-        newTx = newTx * adjust;
+
+        cv::Mat _update = newTx.getMat(cv::ACCESS_READ) * adjust;
+        _update.copyTo(newTx);
         std::cerr << newTx << std::endl << std::endl;
     }
 
@@ -59,7 +61,7 @@ static std::vector<cv::Mat> CenterTransforms(const std::vector<cv::Mat>& txs,
 
 int main(int argc, char** argv) {
     cv::Size frameSize;
-    VectorizeData<cv::Mat> txs;
+    VectorizeData<cv::UMat> txs;
     int frameCap = -1;
     {
         VideoCaptureSource src(argv[1]);
@@ -68,7 +70,6 @@ int main(int argc, char** argv) {
 
         src.frameCap = frameCap;
 
-        HumanPoseEstimationKernel pose;
         CannyEdgeKernel canny;
         StabalizeVideo flow;
         DiffMask diff;
@@ -83,12 +84,12 @@ int main(int argc, char** argv) {
 
     cv::Size targetSize;
     auto newTxs = CenterTransforms(txs.Data(), frameSize, targetSize);
-
+    newTxs.pop_back();
     {
         VideoCaptureSource src(argv[1]);
         VideoCaptureSink sink(std::string(argv[1]) + ".stabalized.avi", CV_FOURCC('M', 'J', 'P', 'G'));
 
-        FromVector_<cv::Mat> txsSrc(newTxs);
+        FromVector_<cv::UMat> txsSrc(newTxs);
 
         WarpAffine warp(targetSize, cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0xff, 0x39, 0xec));
 

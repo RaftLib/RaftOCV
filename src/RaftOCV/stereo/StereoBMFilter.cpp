@@ -9,8 +9,8 @@ struct StereoBMFilter_p {
 
     cv::Ptr<cv::StereoBM> sbm;
     cv::Size imageSize = { 0, 0 };
-    cv::Mat depth;
-    cv::Mat left, right;
+    cv::UMat depth;
+    cv::UMat left, right;
 
     StereoBMFilter_p(StereoBMFilter &t) : t(t), sbm(cv::StereoBM::create(160, 21)) {
         sbm->setPreFilterSize(5);
@@ -28,20 +28,20 @@ struct StereoBMFilter_p {
             t.input["calib"].pop(calib);
         }
 
-        auto &in = t.input["0"].template peek<cv::Mat>();
+        auto &in = t.input["0"].template peek<cv::UMat>();
 
         cv::Size s(in.cols / 2, in.rows);
         if(s != imageSize) {
             imageSize = s;
 
-            depth = cv::Mat(s.height, s.width, CV_16S );
+            depth = cv::UMat(s.height, s.width, CV_16S );
 
             left.create(imageSize, CV_8UC1);
             right.create(imageSize, CV_8UC1);
         }
 
-        cv::Mat right_roi(in, cv::Rect(0, 0, s.width,s.height));
-        cv::Mat left_roi(in, cv::Rect(s.width, 0, s.width,s.height));
+        cv::UMat right_roi(in, cv::Rect(0, 0, s.width,s.height));
+        cv::UMat left_roi(in, cv::Rect(s.width, 0, s.width,s.height));
 
         cv::cvtColor(left_roi, left, cv::COLOR_RGB2GRAY);
         cv::cvtColor(right_roi, right, cv::COLOR_RGB2GRAY);
@@ -51,13 +51,13 @@ struct StereoBMFilter_p {
 
         sbm->compute(left, right, depth);
 
-        auto &out = t.output["0"].template allocate<MetadataEnvelope<cv::Mat>>();
+        auto &out = t.output["0"].template allocate<MetadataEnvelope<cv::UMat>>();
         out = depth.clone();
         t.output["0"].send();
 
 
         if(calib && t.hasPCOutput) {
-            cv::Mat points, points1, disp8;
+            cv::UMat points, points1, disp8;
             cv::normalize(depth, disp8, 0, 255, CV_MINMAX, CV_8U);
             cv::reprojectImageTo3D(disp8, points, calib->Q, true);
 
@@ -91,8 +91,8 @@ struct StereoBMFilter_p {
 };
 
 StereoBMFilter::StereoBMFilter() : p(new StereoBMFilter_p(*this)) {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 
 StereoBMFilter::~StereoBMFilter() {

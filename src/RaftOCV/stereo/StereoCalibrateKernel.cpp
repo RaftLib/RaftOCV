@@ -35,8 +35,8 @@ void StereoCalibrateKernel::calculate() {
 
     auto results = std::make_shared<StereoCalibrationResults>();
 
-    results->right.cameraMatrix = initCameraMatrix2D(matchedObjectPoints, imagePoints, imageSize);
-    results->left.cameraMatrix = initCameraMatrix2D(matchedObjectPoints, otherImagePoints, imageSize);
+    results->right.cameraMatrix = initCameraMatrix2D(matchedObjectPoints, imagePoints, imageSize).getUMat(cv::ACCESS_READ);
+    results->left.cameraMatrix = initCameraMatrix2D(matchedObjectPoints, otherImagePoints, imageSize).getUMat(cv::ACCESS_READ);
 
     results->rms = cv::stereoCalibrate(matchedObjectPoints, imagePoints, otherImagePoints,
                                        results->right.cameraMatrix, results->right.distCoeffs,

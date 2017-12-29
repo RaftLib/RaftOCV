@@ -9,8 +9,8 @@ template <> struct PointerMember_<DiffMask> {
 
     PointerMember_() : bgSub(cv::createBackgroundSubtractorMOG2(33, 16, false)) {}
 
-    cv::Mat run(const cv::Mat& img) {
-        cv::Mat mask, rtn;
+    cv::UMat run(const cv::UMat& img) {
+        cv::UMat mask, rtn;
         bgSub->apply(img, mask);
 
         img.copyTo(rtn, mask);
@@ -23,10 +23,10 @@ DiffMask::~DiffMask() {
 }
 
 raft::kstatus DiffMask::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
 
-    MetadataEnvelope<cv::Mat> out(img_in.Metadata());
+    MetadataEnvelope<cv::UMat> out(img_in.Metadata());
 
     out = p->run(img_in);
     output["0"].push(out);
@@ -35,6 +35,6 @@ raft::kstatus DiffMask::run() {
 }
 
 DiffMask::DiffMask() : KernelTemplate(new PointerMember_<DiffMask>()){
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }

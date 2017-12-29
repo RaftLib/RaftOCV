@@ -1,9 +1,9 @@
 #include "ApplyFilter.h"
 
-MetadataEnvelope<cv::Mat> ApplyFilterFunctor::operator()(const MetadataEnvelope<cv::Mat> &in) {
-    MetadataEnvelope<cv::Mat> rtn(in);
+MetadataEnvelope<cv::UMat> ApplyFilterFunctor::operator()(const MetadataEnvelope<cv::UMat> &in) {
+    MetadataEnvelope<cv::UMat> rtn(in);
     cv::filter2D(in, rtn, -1, filter);
     return rtn;
 }
 
-ApplyFilterFunctor::ApplyFilterFunctor(const cv::Mat &filter) : filter(filter) {}
+ApplyFilterFunctor::ApplyFilterFunctor(const cv::UMat &filter) : filter(filter) {}

@@ -142,11 +142,11 @@ struct UVCSource_p {
         //std::cerr << t.output["0"].size() << std::endl;
         //t.output[ "0" ].recycle(t.output["0"].size());
 
-        MetadataEnvelope<cv::Mat> frame;
+        MetadataEnvelope<cv::UMat> frame;
 
         cv::Mat yuv(frameHeight, frameWidth, CV_8UC2, buffers[buf.index].start);
         frame.Metadata().originId = frameId++;
-        frame = yuv.clone();
+        frame = yuv.clone().getUMat(cv::ACCESS_READ);
 
         t.output[ "0" ].push(frame);
 
@@ -161,11 +161,11 @@ raft::kstatus UVCSource::run() {
 }
 
 UVCSource::UVCSource(const std::string& source) : p(new UVCSource_p(source, *this)) {
-    output.addPort < MetadataEnvelope<cv::Mat> > ("0");
+    output.addPort < MetadataEnvelope<cv::UMat> > ("0");
 }
 
 UVCSource::UVCSource(uint32_t& width, uint32_t& height, const std::string &source) : p(new UVCSource_p(source, *this, &width, &height)) {
-    output.addPort < MetadataEnvelope<cv::Mat> > ("0");
+    output.addPort < MetadataEnvelope<cv::UMat> > ("0");
 }
 
 UVCSource::~UVCSource() {}

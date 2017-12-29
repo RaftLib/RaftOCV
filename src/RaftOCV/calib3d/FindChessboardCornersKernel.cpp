@@ -7,22 +7,22 @@
 #include "src/RaftOCV/utility/Metadata.h"
 
 FindChessboardCornersKernel::FindChessboardCornersKernel(const cv::Size &patternSize) : patternSize(patternSize) {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
     output.addPort<MetadataEnvelope<std::vector<cv::Point2f>>>("0");
     if(enableOutput) {
-        output.addPort<MetadataEnvelope<cv::Mat>>("debug");
+        output.addPort<MetadataEnvelope<cv::UMat>>("debug");
     }
 }
 
 raft::kstatus FindChessboardCornersKernel::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
 
     MetadataEnvelope<std::vector<cv::Point2f>> out(img_in.Metadata());
     bool success = cv::findChessboardCorners(img_in, patternSize, out, cv::CALIB_CB_FAST_CHECK);
 
     if(success) {
-        cv::Mat gray;
+        cv::UMat gray;
         cv::cvtColor(img_in, gray, CV_RGB2GRAY);
 
         cv::cornerSubPix(gray, out, cv::Size(11, 11), cv::Size(-1, -1),
@@ -31,7 +31,7 @@ raft::kstatus FindChessboardCornersKernel::run() {
     }
 
     if(enableOutput) {
-        auto &debug = output["debug"].template allocate<MetadataEnvelope<cv::Mat>>(img_in.Metadata());
+        auto &debug = output["debug"].template allocate<MetadataEnvelope<cv::UMat>>(img_in.Metadata());
         debug = img_in.clone();
         cv::drawChessboardCorners(debug, patternSize, out, success);
         output["debug"].send();

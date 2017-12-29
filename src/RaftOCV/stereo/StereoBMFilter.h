@@ -14,7 +14,7 @@ class StereoBMFilter : public raft::kernel
     bool hasPCOutput = false;
     bool hasCalibInput = false;
 public:
-    typedef MetadataEnvelope<cv::Mat> output_t;
+    typedef MetadataEnvelope<cv::UMat> output_t;
     StereoBMFilter();
     ~StereoBMFilter();
 

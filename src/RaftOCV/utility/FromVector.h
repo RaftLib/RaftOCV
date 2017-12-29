@@ -11,8 +11,6 @@ public:
             return raft::stop;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(33));
-
         output["0"].push(data[idx++]);
         return raft::proceed;
     }

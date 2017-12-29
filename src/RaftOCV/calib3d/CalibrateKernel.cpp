@@ -41,7 +41,7 @@ void CalibrateKernel::calculate() {
     using namespace cv;
 
     SingleCalibrationCameraResults results;
-    results.cameraMatrix = initCameraMatrix2D(matchedObjectPoints,imagePoints,imageSize);
+    results.cameraMatrix = initCameraMatrix2D(matchedObjectPoints,imagePoints,imageSize).getUMat(cv::ACCESS_READ);
     results.rms = cv::calibrateCamera(matchedObjectPoints, imagePoints, imageSize,
                                       results.cameraMatrix, results.distCoeffs, results.rvecs, results.tvecs,
                         CALIB_FIX_ASPECT_RATIO +

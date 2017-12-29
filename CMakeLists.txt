@@ -20,6 +20,7 @@ option(USE_ASAN "Use Address and UB sanitizers" OFF)
 option(USE_PROFILER "Use Address and UB sanitizers" OFF)
 option(BUILD_EXAMPLES "Build the example applications" ON)
 option(USE_PCL "Use PCL library" OFF)
+option(USE_OPENPOSE "Use OpenPose library" OFF)
 
 find_package(QtPropertyBrowser)
 
@@ -67,22 +68,28 @@ find_path(RAFT_LIB_INCLUDES raft HINTS ${CGET_RaftLib_INSTALL_ROOT})
 add_library(RaftOCV STATIC ${RAFTOCV_SRC})
 target_include_directories(RaftOCV PUBLIC ${RAFT_LIB_INCLUDES} ${OpenCV_INCLUDE_DIRS})
 
+find_package(OpenCV)
+
 target_link_libraries(RaftOCV
         ${RAFT_LIB}
         Qt5::Core Qt5::Gui Qt5::Widgets
         v4l2
-	${OpenCV_LIBS}	
+        ${OpenCV_LIBS}
         ${PCL_LIBRARIES}
         GL
         ${CMAKE_THREAD_LIBS_INIT})
+
+message("${OpenCV_LIBS}")
 
 IF(USE_PCL)
     find_package(PCL 1.8 REQUIRED)
     target_link_libraries(RaftOCV ${PCL_LIBRARIES} OpenNI2 glfw )
 ENDIF()
 
-target_link_libraries(RaftOCV QtPropertyBrowser openpose)
-
+IF(USE_OPENPOSE)
+    target_link_libraries(RaftOCV QtPropertyBrowser openpose)
+ENDIF()
+target_link_libraries(RaftOCV QtPropertyBrowser)
 
 
 if(BUILD_EXAMPLES)

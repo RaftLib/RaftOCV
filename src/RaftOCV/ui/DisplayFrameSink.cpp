@@ -114,7 +114,7 @@ void Deregister(KeyListener_t& listener) {
 }
 
 raft::kstatus DisplayFrameSink::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
     width = img_in.cols;
     height = img_in.rows;
@@ -134,7 +134,7 @@ raft::kstatus DisplayFrameSink::run() {
 }
 
 DisplayFrameSink::DisplayFrameSink(const std::string &frameName) : frameName(frameName) {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
     frames[frameName] = this;
 }
 

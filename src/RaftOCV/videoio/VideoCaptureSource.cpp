@@ -22,7 +22,7 @@ struct VideoCapture_p : public cv::VideoCapture {
 };
 
 
-bool VideoCaptureSource::getNextFrame(cv::Mat &img) {
+bool VideoCaptureSource::getNextFrame(cv::UMat &img) {
     if(frameCap!=-1) {
         if(frameCap == 0 || frameCap-- == 0)
             return false;
@@ -47,7 +47,7 @@ bool VideoCaptureSource::getNextFrame(cv::Mat &img) {
 }
 
 raft::kstatus VideoCaptureSource::run() {
-    MetadataEnvelope<cv::Mat> frame;
+    MetadataEnvelope<cv::UMat> frame;
     bool success = getNextFrame(frame);
     frame.metadata.originId = p->frameId++;
 
@@ -62,7 +62,7 @@ VideoCaptureSource::~VideoCaptureSource() {
 }
 
 VideoCaptureSource::VideoCaptureSource(VideoCapture_p * p) : p(p){
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 
 VideoCaptureSource::VideoCaptureSource() : VideoCaptureSource(new VideoCapture_p()){

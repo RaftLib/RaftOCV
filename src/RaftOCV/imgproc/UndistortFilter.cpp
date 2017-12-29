@@ -19,15 +19,15 @@ raft::kstatus UndistortFilter::run() {
             calculate(*c);
     }
 
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
 
     if(!map1.empty() && !map2.empty()) {
-        auto &out = output["0"].template allocate<MetadataEnvelope<cv::Mat>>(img_in.Metadata());
+        auto &out = output["0"].template allocate<MetadataEnvelope<cv::UMat>>(img_in.Metadata());
         cv::remap(img_in, out, map1, map2, cv::INTER_LINEAR);
         output["0"].send();
     } else {
-        auto &out = output["0"].template allocate<MetadataEnvelope<cv::Mat>>(img_in.Metadata());
+        auto &out = output["0"].template allocate<MetadataEnvelope<cv::UMat>>(img_in.Metadata());
         out = img_in;
         output["0"].send();
     }
@@ -35,7 +35,7 @@ raft::kstatus UndistortFilter::run() {
     return (raft::proceed);
 }
 
-UndistortFilter::UndistortFilter(const cv::Mat &map1, const cv::Mat &map2) : map1(map1), map2(map2), expectCalibKernel(false) {
+UndistortFilter::UndistortFilter(const cv::UMat &map1, const cv::UMat &map2) : map1(map1), map2(map2), expectCalibKernel(false) {
     setupPorts();
 }
 
@@ -51,13 +51,13 @@ UndistortFilter::UndistortFilter(bool isRightCamera, const StereoCalibrationResu
     calculate(calib);
 }
 void UndistortFilter::calculate(const SingleCalibrationCameraResults &calib) {
-    cv::Mat R, newCamMat;
+    cv::UMat R, newCamMat;
     cv::initUndistortRectifyMap(calib.cameraMatrix, calib.distCoeffs, R, newCamMat, calib.imageSize, CV_16SC2, map1, map2);
 }
 
 void UndistortFilter::calculate(const StereoCalibrationResults &calib) {
     auto& cam = isRightCamera ? calib.right : calib.left;
-    cv::Mat P = cam.cameraMatrix;
+    cv::UMat P = cam.cameraMatrix;
     if(!cam.cameraMatrix.empty() && !cam.distCoeffs.empty())
         cv::initUndistortRectifyMap(cam.cameraMatrix, cam.distCoeffs, cam.R, P, calib.imageSize, CV_16SC2, map1, map2);
     std::cerr << cam.cameraMatrix << std::endl;
@@ -75,9 +75,9 @@ UndistortFilter::UndistortFilter(bool isRightCamera) : isStereo(true), isRightCa
 }
 
 void UndistortFilter::setupPorts() {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
     if(expectCalibKernel)
         input.addPort<std::shared_ptr<CalibrationResults>>("calib");
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 

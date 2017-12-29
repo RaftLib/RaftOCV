@@ -6,7 +6,7 @@
 
 class DenseOpticalFlow_p {
     DenseOpticalFlow& self;
-    cv::Mat prev;
+    cv::UMat prev;
     cv::cuda::GpuMat gpu_prev;
     size_t drop_cnt = 0;
 
@@ -17,7 +17,7 @@ public:
     DenseOpticalFlow_p(DenseOpticalFlow &self) : self(self) {}
 
     raft::kstatus runCuda() {
-        MetadataEnvelope<cv::Mat> img_in;
+        MetadataEnvelope<cv::UMat> img_in;
         self.input["0"].pop(img_in);
 
         if(drop_cnt++ < self.m_Skip) {
@@ -25,7 +25,7 @@ public:
         }
         drop_cnt = 0;
 
-        cv::Mat gray;
+        cv::UMat gray;
         cv::cvtColor(img_in, gray, cv::COLOR_RGB2GRAY);
 
 
@@ -37,7 +37,7 @@ public:
             return raft::proceed;
         }
 
-        MetadataEnvelope<cv::Mat> out(img_in.Metadata());
+        MetadataEnvelope<cv::UMat> out(img_in.Metadata());
         cv::cuda::GpuMat gpu_denseFlow;
         cv::cuda::GpuMat gpu_gray;
         cv::Mat denseFlow;
@@ -56,7 +56,7 @@ public:
         outf = outf * 100;
         outf.convertTo(out, CV_8UC3);
 
-        cv::Mat magnitude, angle;
+        cv::UMat magnitude, angle;
         cv::cartToPolar(outs[0], outs[1], magnitude, angle, true);
 
         //translate magnitude to range [0;1]
@@ -66,27 +66,27 @@ public:
 
         //build hsv image
         cv::Mat _hsv[3], hsv;
-        _hsv[0] = angle;
+        _hsv[0] = angle.getMat(cv::ACCESS_READ);;
         _hsv[1] = cv::Mat::ones(angle.size(), CV_32F);
-        _hsv[2] = magnitude;
+        _hsv[2] = magnitude.getMat(cv::ACCESS_READ);;
         cv::merge(_hsv, 3, hsv);
 
         //convert to BGR and show
-        cv::Mat bgr;//CV_32FC3 matrix
+        cv::UMat bgr;//CV_32FC3 matrix
         cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
 
-        cv::Mat res;
+        cv::UMat res;
         int optMag = 1;
         cv::threshold(magnitude, res, optMag,100, CV_THRESH_BINARY);
 
-        cv::Mat res2;
+        cv::UMat res2;
         res.convertTo(res2, CV_8UC1, 255);
 
         // Create a structuring element (SE) and do some morphological operation in order to close holes, get unified connected components
         int morph_size = 2;
-        cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE,
+        cv::UMat element = cv::getStructuringElement(cv::MORPH_ELLIPSE,
                                                     cv::Size(2 * morph_size + 1, 2 * morph_size + 1),
-                                                    cv::Point(morph_size, morph_size));
+                                                    cv::Point(morph_size, morph_size)).getUMat(cv::ACCESS_READ);
         morphologyEx(res2, res2, cv::MORPH_CLOSE, element, cv::Point(-1, -1), 12);
         //morphologyEx(src, src, MORPH_ERODE, element, Point(-1, -1), 8);
 
@@ -102,26 +102,26 @@ public:
             return runCuda();
         }
 
-        MetadataEnvelope<cv::Mat> img_in;
+        MetadataEnvelope<cv::UMat> img_in;
         self.input["0"].pop(img_in);
 
-        cv::Mat gray;
+        cv::UMat gray;
         cv::cvtColor(img_in, gray, cv::COLOR_RGB2GRAY);
 
-        if(prev.data == nullptr) {
+        if(prev.empty()) {
             prev = gray;
             return raft::proceed;
         }
 
-        MetadataEnvelope<cv::Mat> out(img_in.Metadata());
-        cv::Mat denseFlow;
+        MetadataEnvelope<cv::UMat> out(img_in.Metadata());
+        cv::UMat denseFlow;
         cv::calcOpticalFlowFarneback(prev, gray, denseFlow, 0.5, 1,
                                      11, 2, 5, 1.2, 0);
 
 
         cv::Mat outs[3];
         cv::Mat outf;
-        cv::split(denseFlow, outs);
+        cv::split(denseFlow.getMat(cv::ACCESS_READ), outs);
         outs[2] = outs[0].mul(outs[1]);
         cv::merge(outs, 3, outf);
         outf = outf * 100;
@@ -139,8 +139,8 @@ raft::kstatus DenseOpticalFlow::run() {
 }
 
 DenseOpticalFlow::DenseOpticalFlow() : p(new DenseOpticalFlow_p(*this)) {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 
 DenseOpticalFlow::~DenseOpticalFlow() {

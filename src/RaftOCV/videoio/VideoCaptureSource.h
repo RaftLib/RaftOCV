@@ -12,7 +12,7 @@ class VideoCaptureSource : public QObject , public raft::kernel{
 
 public:
     int frameCap = -1;
-    bool getNextFrame(cv::Mat& img);
+    bool getNextFrame(cv::UMat& img);
     bool isRealTime = false;
 
 

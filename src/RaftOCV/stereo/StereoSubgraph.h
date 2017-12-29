@@ -14,7 +14,7 @@ class StereoSubgraph {
     CombineFilter combine;
     StereoBMFilter stereo;
 
-    DuplicateKernel < MetadataEnvelope<cv::Mat> > dup, stereoDup, rightOut, leftOut;
+    DuplicateKernel < MetadataEnvelope<cv::UMat> > dup, stereoDup, rightOut, leftOut;
 
 public:
     UndistortFilter undistortR, undistortL;

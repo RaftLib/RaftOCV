@@ -5,61 +5,61 @@
 #include "BgModel.h"
 
 raft::kstatus BgModel::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
 
-    if(!sum.data) {
-        sum = cv::Mat::zeros(img_in.rows, img_in.cols, CV_32FC3);
-        sum2 = cv::Mat::zeros(img_in.rows, img_in.cols, CV_32FC3);
+    if(sum.empty()) {
+        sum = cv::UMat::zeros(img_in.rows, img_in.cols, CV_32FC3);
+        sum2 = cv::UMat::zeros(img_in.rows, img_in.cols, CV_32FC3);
     }
 
-    cv::Mat img_inf;
+    cv::UMat img_inf;
     img_in.convertTo(img_inf, CV_32FC3);
 
-    cv::add(sum, img_inf, sum, cv::Mat(), CV_32FC3);
-    cv::add(sum2, img_inf.mul(img_inf), sum2, cv::Mat(), CV_32FC3);
+    cv::add(sum, img_inf, sum, cv::UMat(), CV_32FC3);
+    cv::add(sum2, img_inf.mul(img_inf), sum2, cv::UMat(), CV_32FC3);
 
-    //total = total + cv::Mat(img_in.rows, img_in.cols, CV_32S, cv::Scalar(1));
+    //total = total + cv::UMat(img_in.rows, img_in.cols, CV_32S, cv::Scalar(1));
     total += 1;
 
     return raft::proceed;
 }
 
 BgModel::BgModel() {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 
-cv::Mat BgModel::Mean() const {
+cv::UMat BgModel::Mean() const {
     auto meanf = MeanF();
-    cv::Mat mean;
+    cv::UMat mean;
 
     meanf.convertTo(mean, CV_8UC3);
 
     return mean;
 }
 
-cv::Mat BgModel::StdDev() const {
-    auto meanf = MeanF();
+cv::UMat BgModel::StdDev() const {
+    auto meanf = MeanF().getMat(cv::ACCESS_READ);
 
     cv::Mat stddevf;
-    cv::Mat stddev2 = (sum2 / (double)total) - (meanf.mul(meanf));
+    cv::Mat stddev2 = (sum2.getMat(cv::ACCESS_READ) / (double)total) - (meanf.mul(meanf));
     cv::threshold(stddev2, stddev2, 0, 0, CV_THRESH_TOZERO);
     stddev2 = stddev2 + cv::Scalar(10,10,10);
     //cv::sqrt(stddev2, stddevf);
     double minVal, maxVal;
     cv::minMaxIdx(stddev2, &minVal, &maxVal);
-    return stddev2;
+    return stddev2.getUMat(cv::ACCESS_READ);
 }
 
-cv::Mat BgModel::MeanF() const {
-    return cv::Mat(sum / (double)total);
+cv::UMat BgModel::MeanF() const {
+    return cv::Mat(sum.getMat(cv::ACCESS_READ) / (double)total).getUMat(cv::ACCESS_READ);
 }
 
 raft::kstatus BgRemoval::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
 
-    cv::Mat imgf;
+    cv::UMat imgf;
     img_in.convertTo(imgf, CV_32FC3);
 
     cv::absdiff(imgf, Mean, imgf);
@@ -68,16 +68,16 @@ raft::kstatus BgRemoval::run() {
     cv::divide(imgf, StdDev, imgf);
 
     cv::Mat imgfs[3];
-    cv::split(imgf, imgfs);
+    cv::split(imgf.getMat(cv::ACCESS_READ), imgfs);
 
     double thresh = 3.0;
     cv::Mat maskf = imgfs[0].mul(imgfs[1]).mul(imgfs[2]);
     cv::GaussianBlur(maskf, maskf, cv::Size(21,21), 0);
     cv::threshold(maskf, maskf, thresh, 1., cv::THRESH_BINARY);
-    cv::Mat mask;
+    cv::UMat mask;
     maskf.convertTo(mask, CV_8U);
 
-    cv::Mat out;
+    cv::UMat out;
     img_in.copyTo(out, mask);
 
     output["0"].push(out);
@@ -88,11 +88,11 @@ raft::kstatus BgRemoval::run() {
         cv::threshold(imgfs[i], imgfs[i], thresh, 1., cv::THRESH_BINARY);
     }
 
-    cv::Mat maskf =
-    cv::Mat mask;
+    cv::UMat maskf =
+    cv::UMat mask;
     maskf.convertTo(mask, CV_8U);
 
-    cv::Mat out;
+    cv::UMat out;
 
 
     //output["0"].push(imgf);
@@ -101,7 +101,7 @@ raft::kstatus BgRemoval::run() {
     */
 }
 
-BgRemoval::BgRemoval(const cv::Mat &Mean, const cv::Mat &StdDev) : Mean(Mean), StdDev(StdDev) {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+BgRemoval::BgRemoval(const cv::UMat &Mean, const cv::UMat &StdDev) : Mean(Mean), StdDev(StdDev) {
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }

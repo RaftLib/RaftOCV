@@ -5,11 +5,11 @@
 #include <RaftOCV/utility/FunctorFilter.h>
 
 class ApplyFilterFunctor {
-    cv::Mat filter;
+    cv::UMat filter;
 public:
-    MetadataEnvelope<cv::Mat> operator()(const MetadataEnvelope<cv::Mat>& in);
+    MetadataEnvelope<cv::UMat> operator()(const MetadataEnvelope<cv::UMat>& in);
 
-    ApplyFilterFunctor(const cv::Mat &filter);
+    ApplyFilterFunctor(const cv::UMat &filter);
 };
 
 typedef FunctorFilter<ApplyFilterFunctor> ApplyFilterFilter;

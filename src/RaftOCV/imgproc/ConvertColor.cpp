@@ -10,8 +10,8 @@
 ConvertColorFunctor::ConvertColorFunctor(int16_t ConversionType) : ConversionType(ConversionType) {
 }
 
-MetadataEnvelope<cv::Mat> ConvertColorFunctor::operator()(const MetadataEnvelope<cv::Mat> &img_in) {
-    MetadataEnvelope<cv::Mat> out;
+MetadataEnvelope<cv::UMat> ConvertColorFunctor::operator()(const MetadataEnvelope<cv::UMat> &img_in) {
+    MetadataEnvelope<cv::UMat> out;
     out.metadata = img_in.Metadata();
     cv::cvtColor(img_in, out, ConversionType);
 

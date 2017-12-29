@@ -3,26 +3,26 @@
 #include <raft>
 
 class BgRemoval : public raft::kernel {
-    cv::Mat Mean;
-    cv::Mat StdDev;
+    cv::UMat Mean;
+    cv::UMat StdDev;
 public:
     raft::kstatus run() override;
 
-    BgRemoval(const cv::Mat &Mean, const cv::Mat &StdDev);
+    BgRemoval(const cv::UMat &Mean, const cv::UMat &StdDev);
 };
 
 class BgModel : public raft::kernel{
 public:
     BgModel();
 
-    cv::Mat sum;
-    cv::Mat sum2;
-    //cv::Mat_<int> total;
+    cv::UMat sum;
+    cv::UMat sum2;
+    //cv::UMat_<int> total;
     int total = 0;
 
-    cv::Mat Mean() const;
-    cv::Mat MeanF() const;
-    cv::Mat StdDev() const;
+    cv::UMat Mean() const;
+    cv::UMat MeanF() const;
+    cv::UMat StdDev() const;
 
     raft::kstatus run() override;
 };

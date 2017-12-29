@@ -7,8 +7,8 @@ CannyEdgeFunctor::CannyEdgeFunctor(double threshold1, double threshold2, int ape
         threshold1), threshold2(threshold2), apertureSize(apertureSize), L2gradient(L2gradient) {
 }
 
-MetadataEnvelope<cv::Mat> CannyEdgeFunctor::operator()(const MetadataEnvelope<cv::Mat> &img_in) {
-    MetadataEnvelope<cv::Mat> out;
+MetadataEnvelope<cv::UMat> CannyEdgeFunctor::operator()(const MetadataEnvelope<cv::UMat> &img_in) {
+    MetadataEnvelope<cv::UMat> out;
     out.metadata = img_in.Metadata();
     cv::Canny(img_in, out, threshold1, threshold2, apertureSize, L2gradient);
     return out;

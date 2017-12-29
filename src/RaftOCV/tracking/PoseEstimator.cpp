@@ -34,7 +34,7 @@ struct HumanPoseEstimationKernel_p {
 
     bool hasInit = false;
 
-    cv::Mat run(const cv::Mat& inputImage) {
+    cv::UMat run(const cv::UMat& inputImage) {
 
         if(hasInit == false) {
             hasInit = true;
@@ -50,23 +50,23 @@ struct HumanPoseEstimationKernel_p {
         std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
                 = scaleAndSizeExtractor.extract(imageSize);
         // Step 3 - Format input image to OpenPose input and output formats
-        const auto netInputArray = cvMatToOpInput.createArray(inputImage, scaleInputToNetInputs, netInputSizes);
-        auto outputArray = cvMatToOpOutput.createArray(inputImage, scaleInputToOutput, outputResolution);
+        const auto netInputArray = cvMatToOpInput.createArray(inputImage.getMat(cv::ACCESS_READ), scaleInputToNetInputs, netInputSizes);
+        auto outputArray = cvMatToOpOutput.createArray(inputImage.getMat(cv::ACCESS_READ), scaleInputToOutput, outputResolution);
         // Step 4 - Estimate poseKeypoints
         poseExtractorCaffe.forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
         const auto poseKeypoints = poseExtractorCaffe.getPoseKeypoints();
         // Step 5 - Render poseKeypoints
         poseRenderer.renderPose(outputArray, poseKeypoints, scaleInputToOutput);
-        // Step 6 - OpenPose output format to cv::Mat
-        return opOutputToCvMat.formatToCvMat(outputArray);
+        // Step 6 - OpenPose output format to cv::UMat
+        return opOutputToCvMat.formatToCvMat(outputArray).getUMat(cv::ACCESS_READ);
     }
 };
 
 raft::kstatus HumanPoseEstimationKernel::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
     input["0"].pop(img_in);
 
-    MetadataEnvelope<cv::Mat> out(img_in.Metadata());
+    MetadataEnvelope<cv::UMat> out(img_in.Metadata());
 
     out = p->run(img_in);
 
@@ -77,8 +77,8 @@ raft::kstatus HumanPoseEstimationKernel::run() {
 HumanPoseEstimationKernel::HumanPoseEstimationKernel() : p(new HumanPoseEstimationKernel_p(op::flagsToPoseModel("COCO"),
                                                                                            "/home/justin/source/RaftOCV/.cget-bin/0.1/packages/OpenPose_HEAD/models/",
                                                                                            0, {}, op::ScaleMode::ZeroToOne, false)){
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 
 HumanPoseEstimationKernel::~HumanPoseEstimationKernel() {

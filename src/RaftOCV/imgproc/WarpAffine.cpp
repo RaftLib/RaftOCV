@@ -6,25 +6,31 @@ WarpAffine::WarpAffine(const cv::Size &destSize,
                        int flags,
                        int borderMode,
                        const cv::Scalar& borderValue) : destSize(destSize), flags(flags), borderMode(borderMode), borderValue(borderValue) {
-    input.addPort<MetadataEnvelope<cv::Mat>>("0");
-    input.addPort<cv::Mat>("tx");
+    input.addPort<MetadataEnvelope<cv::UMat>>("0");
+    input.addPort<cv::UMat>("tx");
 
-    output.addPort<MetadataEnvelope<cv::Mat>>("0");
+    output.addPort<MetadataEnvelope<cv::UMat>>("0");
 }
 
 raft::kstatus WarpAffine::run() {
-    MetadataEnvelope<cv::Mat> img_in;
+    MetadataEnvelope<cv::UMat> img_in;
+    std::cerr << input["0"].size() << " to " << input["tx"].size() << std::endl;
+    if(input["0"].size() == 0 && input["tx"].size() == 0) {
+        return raft::stop;
+    }
+
     if(input["0"].size() == 0 || input["tx"].size() == 0)
         return raft::proceed;
 
     input["0"].pop(img_in);
 
-    cv::Mat tx;
+    cv::UMat tx;
     input["tx"].pop(tx);
 
-    MetadataEnvelope<cv::Mat> out(img_in.Metadata());
+    MetadataEnvelope<cv::UMat> out(img_in.Metadata());
 
-    cv::warpAffine(img_in, out, cv::Mat(tx.inv(cv::DECOMP_SVD)).rowRange(0, 2), destSize, flags, borderMode, borderValue);
+    auto itx = tx.inv(cv::DECOMP_SVD);
+    cv::warpAffine(img_in, out, itx.rowRange(0, 2), destSize, flags, borderMode, borderValue);
 
     output["0"].push(out);
 

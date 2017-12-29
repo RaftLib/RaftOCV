@@ -1,9 +1,13 @@
 SET(MAINS video_capture video_save
-        video_playback camera_calibrate video_stabilization video_bgmodel pose_tracker
+        video_playback camera_calibrate video_stabilization video_bgmodel
         dense_optical_flow)
 
 if(USE_PCL)
     LIST(APPEND MAINS stereo_capture stereo_calibrate)
+ENDIF()
+
+if(USE_OPENPOSE)
+    LIST(APPEND MAINS pose_tracker)
 ENDIF()
 
 

@@ -3,11 +3,11 @@
 #include "SplitFilter.h"
 
 raft::kstatus SplitFilter::run() {
-    MetadataEnvelope<cv::Mat> in, outA, outB;
+    MetadataEnvelope<cv::UMat> in, outA, outB;
     input["0"].pop(in);
 
-    outA = cv::Mat(in, cv::Rect(0, 0, in.size().width / 2, in.size().height));
-    outB = cv::Mat(in, cv::Rect(in.size().width / 2, 0, in.size().width / 2, in.size().height));
+    outA = cv::UMat(in, cv::Rect(0, 0, in.size().width / 2, in.size().height));
+    outB = cv::UMat(in, cv::Rect(in.size().width / 2, 0, in.size().width / 2, in.size().height));
     outA.metadata = in.Metadata();
     outB.metadata = in.Metadata();
 
@@ -18,7 +18,7 @@ raft::kstatus SplitFilter::run() {
 }
 
 SplitFilter::SplitFilter() {
-    input.addPort<  MetadataEnvelope<cv::Mat> > ("0");
-    output.addPort< MetadataEnvelope<cv::Mat> > ("0");
-    output.addPort< MetadataEnvelope<cv::Mat> > ("1");
+    input.addPort<  MetadataEnvelope<cv::UMat> > ("0");
+    output.addPort< MetadataEnvelope<cv::UMat> > ("0");
+    output.addPort< MetadataEnvelope<cv::UMat> > ("1");
 }

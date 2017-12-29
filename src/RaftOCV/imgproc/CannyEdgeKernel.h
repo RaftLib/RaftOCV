@@ -11,7 +11,7 @@ class CannyEdgeFunctor {
     bool L2gradient = false;
 
     CannyEdgeFunctor(double threshold1 = 100, double threshold2 = 100, int apertureSize = 3, bool L2gradient = false);
-    MetadataEnvelope<cv::Mat> operator()(const MetadataEnvelope<cv::Mat>& img_in);
+    MetadataEnvelope<cv::UMat> operator()(const MetadataEnvelope<cv::UMat>& img_in);
 };
 
 typedef FunctorFilter<CannyEdgeFunctor> CannyEdgeKernel;

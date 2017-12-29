@@ -1,6 +1,7 @@
 
 add_subdirectory(imgproc)
 add_subdirectory(utility)
+add_subdirectory(tracking)
 
 ADD_SOURCES(
         videoio/UVCSource
@@ -13,10 +14,6 @@ ADD_SOURCES(
         stereo/StereoSubgraph
         calib3d/CalibrationTypes
         ui/KeyListener
-        tracking/PoseEstimator
-        tracking/StabalizeVideo
-        tracking/BgModel
-        tracking/DenseOpticalFlow
         ui/UIMap
         ui/objectcontroller
 )

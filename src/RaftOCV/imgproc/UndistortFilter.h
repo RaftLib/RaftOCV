@@ -6,7 +6,7 @@
 class StereoCalibrationResults;
 
 class UndistortFilter : public raft::kernel {
-    cv::Mat map1, map2;
+    cv::UMat map1, map2;
 
     bool isStereo = false;
     bool isRightCamera;
@@ -18,7 +18,7 @@ class UndistortFilter : public raft::kernel {
 public:
     UndistortFilter();
     UndistortFilter(bool isRightCamera);
-    UndistortFilter(const cv::Mat &map1, const cv::Mat &map2);
+    UndistortFilter(const cv::UMat &map1, const cv::UMat &map2);
     UndistortFilter(const SingleCalibrationCameraResults& calib);
     UndistortFilter(bool isRightCamera, const StereoCalibrationResults& calib);
     raft::kstatus run() override;

@@ -84,9 +84,9 @@ public:
 
         // Create a structuring element (SE) and do some morphological operation in order to close holes, get unified connected components
         int morph_size = 2;
-        cv::UMat element = cv::getStructuringElement(cv::MORPH_ELLIPSE,
+        cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE,
                                                     cv::Size(2 * morph_size + 1, 2 * morph_size + 1),
-                                                    cv::Point(morph_size, morph_size)).getUMat(cv::ACCESS_READ);
+                                                    cv::Point(morph_size, morph_size));
         morphologyEx(res2, res2, cv::MORPH_CLOSE, element, cv::Point(-1, -1), 12);
         //morphologyEx(src, src, MORPH_ERODE, element, Point(-1, -1), 8);
 

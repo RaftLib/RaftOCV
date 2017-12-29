@@ -66,9 +66,10 @@ find_library(RAFT_LIB raft raftd)
 find_path(RAFT_LIB_INCLUDES raft HINTS ${CGET_RaftLib_INSTALL_ROOT})
 
 add_library(RaftOCV STATIC ${RAFTOCV_SRC})
-target_include_directories(RaftOCV PUBLIC ${RAFT_LIB_INCLUDES} ${OpenCV_INCLUDE_DIRS})
 
 find_package(OpenCV)
+
+target_include_directories(RaftOCV PUBLIC ${RAFT_LIB_INCLUDES} ${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(RaftOCV
         ${RAFT_LIB}

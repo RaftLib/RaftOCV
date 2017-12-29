@@ -1,7 +1,6 @@
     include(${CGET_CORE_DIR}.cget/core.cmake)
 
     CGET_HAS_DEPENDENCY(OpenCV GITHUB opencv/opencv VERSION 3.3.1
-            NO_FIND_PACKAGE
             OPTIONS
             -DENABLE_PRECOMPILED_HEADERS:BOOL=OFF
             -DBUILD_WITH_STATIC_CRT:BOOL=OFF

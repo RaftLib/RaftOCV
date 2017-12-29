@@ -68,7 +68,7 @@ public:
         cv::Mat _hsv[3], hsv;
         _hsv[0] = angle.getMat(cv::ACCESS_READ);;
         _hsv[1] = cv::Mat::ones(angle.size(), CV_32F);
-        _hsv[2] = magnitude.getMat(cv::ACCESS_READ);;
+        _hsv[2] = magnitude.getMat(cv::ACCESS_READ).clone();
         cv::merge(_hsv, 3, hsv);
 
         //convert to BGR and show

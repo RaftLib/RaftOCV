@@ -9,17 +9,15 @@
 cv::Size targetSize;
 
 int main(int argc, char** argv) {
-    QApplication app(argc, argv);
-
     VideoCaptureSource src(argv[1]);
     DisplayFrameSink sink("Stabalize");
-    UIMap m;
+    raft::map m;
 
     DenseOpticalFlow flow;
 
     m += src >> flow >> sink;
 
-    m.exec();
+    m.exe();
 
     return( EXIT_SUCCESS );
 }

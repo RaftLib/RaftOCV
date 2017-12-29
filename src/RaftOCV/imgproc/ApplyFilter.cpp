@@ -7,3 +7,7 @@ MetadataEnvelope<cv::UMat> ApplyFilterFunctor::operator()(const MetadataEnvelope
 }
 
 ApplyFilterFunctor::ApplyFilterFunctor(const cv::UMat &filter) : filter(filter) {}
+
+ApplyFilterFunctor::ApplyFilterFunctor(const cv::Mat &filter) : filter(filter.getUMat(cv::ACCESS_READ)){
+
+}

@@ -1,4 +1,4 @@
-SET(MAINS video_capture video_save
+SET(MAINS video_capture video_save blur
         video_playback camera_calibrate video_stabilization video_bgmodel
         dense_optical_flow)
 
